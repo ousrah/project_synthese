@@ -238,19 +238,43 @@ php artisan migrate</code></pre>
             </div>
         </div>
         
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">Accesseur pour faciliter l'accès</h4>
-            
             <div class="code-block-wrapper">
                 <span class="code-lang">php</span>
-                <pre class="code-block"><code><span class="token-comment">// app/Models/Product.php - Ajouter un accessor</span>
+                <pre class="code-block"><code><span class="token-comment">// app/Models/Product.php - Accesseur complet</span>
 
 <span class="token-keyword">public function</span> <span class="token-function">getThumbnailUrlAttribute</span>(): <span class="token-keyword">string</span>
 {
-    <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">getFirstMediaUrl</span>(<span class="token-string">'images'</span>, <span class="token-string">'thumb'</span>) 
-        ?: <span class="token-string">'https://via.placeholder.com/300x200'</span>;
+    <span class="token-comment">// 1. Image uploadée manuellement</span>
+    <span class="token-keyword">if</span> (<span class="token-variable">$this</span>->thumbnail) {
+        <span class="token-keyword">return</span> asset(<span class="token-string">'storage/'</span> . <span class="token-variable">$this</span>->thumbnail);
+    }
+    
+    <span class="token-comment">// 2. Spatie Media Library</span>
+    <span class="token-keyword">if</span> (<span class="token-variable">$this</span>-><span class="token-function">hasMedia</span>(<span class="token-string">'thumbnail'</span>)) {
+        <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">getFirstMediaUrl</span>(<span class="token-string">'thumbnail'</span>);
+    }
+    
+    <span class="token-comment">// 3. Image Unsplash selon le type de produit</span>
+    <span class="token-variable">$unsplashIds</span> = [
+        <span class="token-string">'digital'</span> => <span class="token-string">'1544716278-ca5e3f4abd8c'</span>,
+        <span class="token-string">'course'</span> => <span class="token-string">'1516321318423-f06f85e504b3'</span>,
+        <span class="token-string">'subscription'</span> => <span class="token-string">'1460925895917-afdab827c52f'</span>,
+        <span class="token-string">'license'</span> => <span class="token-string">'1555066931-4365d14bab8c'</span>,
+    ];
+    
+    <span class="token-variable">$imageId</span> = <span class="token-variable">$unsplashIds</span>[<span class="token-variable">$this</span>->type] ?? <span class="token-variable">$unsplashIds</span>[<span class="token-string">'digital'</span>];
+    <span class="token-keyword">return</span> <span class="token-string">"https://images.unsplash.com/photo-{$imageId}?w=400&amp;h=300&amp;fit=crop&amp;auto=format"</span>;
 }</code></pre>
                 <button class="copy-btn">Copier</button>
+            </div>
+            
+            <div class="alert-info mt-4">
+                <strong>📖 Stratégie de fallback à 3 niveaux :</strong>
+                <ol class="list-decimal ml-6 mt-2 text-sm">
+                    <li><strong>thumbnail</strong> : Chemin stocké en base (upload simple)</li>
+                    <li><strong>hasMedia('thumbnail')</strong> : Via Spatie Media Library</li>
+                    <li><strong>Unsplash</strong> : Image par défaut selon le type de produit</li>
+                </ol>
             </div>
             
             <p class="text-gray-700 mt-4">

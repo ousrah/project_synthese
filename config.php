@@ -19,6 +19,9 @@ define('COURSE_DURATION', '');
 $course_parts = [
     "Séance 1 : Fondations & Catalogue" => [
         ['id' => 'seance1-intro', 'title' => "1.1 Introduction au Projet & Objectifs"],
+        ['id' => 'seance1-cahier-charges', 'title' => "1.1.1 Cahier des Charges"],
+        ['id' => 'seance1-schema', 'title' => "1.1.2 Schéma Relationnel (ERD)"],
+        ['id' => 'seance1-sprints', 'title' => "1.1.3 Planning de Développement (Sprints)"],
         ['id' => 'seance1-install', 'title' => "1.2 Installation de Laravel 12 & Configuration"],
         ['id' => 'seance1-models', 'title' => "1.3 Modèles Product & Category (Migrations, Seeders)"],
         ['id' => 'seance1-layout', 'title' => "1.4 Layout Public & Affichage du Catalogue"],

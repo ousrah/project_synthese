@@ -11,13 +11,14 @@
     <h3 class="text-2xl font-semibold mb-3">1.1 Introduction au Projet & Objectifs</h3>
     <p class="text-xl text-gray-600 mb-8 leading-relaxed">
         Bienvenue dans ce projet de synthèse ! Nous allons construire une <strong>marketplace de produits numériques</strong> 
-        complète, permettant à plusieurs vendeurs de proposer leurs produits (ebooks, logiciels, templates) 
+        complète, permettant à plusieurs vendeurs de proposer leurs produits (ebooks, logiciels, templates, cours) 
         et aux clients de les acheter via Stripe ou PayPal.
     </p>
     
     <div class="section-card">
         <h4 class="text-lg font-semibold text-gray-900 mb-4">🎯 Objectifs de cette séance</h4>
         <ul class="checklist">
+            <li>Comprendre le cahier des charges et l'architecture du projet</li>
             <li>Installer et configurer un nouveau projet Laravel 12</li>
             <li>Créer les modèles Product et Category avec leurs migrations</li>
             <li>Créer les seeders avec des données de démonstration</li>
@@ -34,6 +35,245 @@
         <a href="#page-top" class="text-sm font-semibold text-blue-600 hover:underline">↑ Retour en haut</a>
     </div>
 </section>
+
+<!-- ========== CAHIER DES CHARGES ========== -->
+<section id="seance1-cahier-charges" class="mb-16">
+    <h3 class="text-2xl font-semibold mb-3">1.1.1 Cahier des Charges</h3>
+    
+    <div class="section-card space-y-6">
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">📋 Description du Projet</h4>
+            <p class="text-gray-700 mb-4">
+                <strong>DigiMarket</strong> est une marketplace multi-vendeurs permettant la vente de produits numériques.
+                Les vendeurs peuvent créer leur boutique, gérer leurs produits et recevoir des paiements. 
+                Les clients peuvent parcourir le catalogue, acheter et télécharger leurs achats.
+            </p>
+        </div>
+        
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">👥 Acteurs du Système</h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h5 class="font-bold text-blue-800"><i class="bi bi-person"></i> Client</h5>
+                    <ul class="text-sm text-gray-700 mt-2 list-disc ml-4">
+                        <li>Parcourir les produits</li>
+                        <li>Ajouter au panier</li>
+                        <li>Payer (Stripe/PayPal)</li>
+                        <li>Télécharger les achats</li>
+                        <li>Laisser des avis</li>
+                    </ul>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h5 class="font-bold text-green-800"><i class="bi bi-shop"></i> Vendeur</h5>
+                    <ul class="text-sm text-gray-700 mt-2 list-disc ml-4">
+                        <li>Créer sa boutique</li>
+                        <li>Gérer ses produits</li>
+                        <li>Voir ses ventes</li>
+                        <li>Recevoir des paiements</li>
+                        <li>Répondre aux avis</li>
+                    </ul>
+                </div>
+                <div class="bg-red-50 p-4 rounded-lg">
+                    <h5 class="font-bold text-red-800"><i class="bi bi-shield-check"></i> Admin</h5>
+                    <ul class="text-sm text-gray-700 mt-2 list-disc ml-4">
+                        <li>Gérer les utilisateurs</li>
+                        <li>Modérer les produits</li>
+                        <li>Vérifier les boutiques</li>
+                        <li>Configurer la plateforme</li>
+                        <li>Voir les statistiques</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">📦 Types de Produits</h4>
+            <table class="w-full text-sm border-collapse">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="border p-2 text-left">Type</th>
+                        <th class="border p-2 text-left">Description</th>
+                        <th class="border p-2 text-left">Exemple</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="border p-2"><code>digital</code></td><td class="border p-2">Fichier téléchargeable</td><td class="border p-2">E-book PDF, Template</td></tr>
+                    <tr><td class="border p-2"><code>subscription</code></td><td class="border p-2">Accès récurrent</td><td class="border p-2">SaaS mensuel</td></tr>
+                    <tr><td class="border p-2"><code>course</code></td><td class="border p-2">Formation en ligne</td><td class="border p-2">Cours vidéo Laravel</td></tr>
+                    <tr><td class="border p-2"><code>license</code></td><td class="border p-2">Clé d'activation</td><td class="border p-2">Logiciel avec licence</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ========== SCHÉMA RELATIONNEL ========== -->
+<section id="seance1-schema" class="mb-16">
+    <h3 class="text-2xl font-semibold mb-3">1.1.2 Schéma Relationnel (ERD)</h3>
+    
+    <div class="section-card">
+        <p class="text-gray-700 mb-4">
+            Voici le schéma entité-relation simplifié de notre application. Les tables principales 
+            sont liées par des clés étrangères pour assurer l'intégrité des données.
+        </p>
+        
+        <div class="bg-gray-50 p-4 rounded-lg mb-4 overflow-x-auto">
+            <pre class="text-sm text-gray-800"><code>
+┌─────────────┐       ┌─────────────┐       ┌─────────────┐
+│   USERS     │       │   STORES    │       │  PRODUCTS   │
+├─────────────┤       ├─────────────┤       ├─────────────┤
+│ id          │◄──────│ user_id     │       │ id          │
+│ name        │       │ id          │◄──────│ store_id    │
+│ email       │       │ name        │       │ name (JSON) │
+│ role        │       │ slug        │       │ slug        │
+│ ...         │       │ commission  │       │ type        │
+└─────────────┘       │ verified_at │       │ price       │
+                      └─────────────┘       │ ...         │
+                                            └─────────────┘
+                                                   │
+        ┌──────────────────────────────────────────┼───────────────────────┐
+        │                                          │                       │
+        ▼                                          ▼                       ▼
+┌─────────────┐       ┌─────────────┐       ┌─────────────┐       ┌─────────────┐
+│ CATEGORIES  │       │  ORDER_ITEMS │      │   REVIEWS   │       │  DOWNLOADS  │
+├─────────────┤       ├─────────────┤       ├─────────────┤       ├─────────────┤
+│ id          │       │ id          │       │ id          │       │ id          │
+│ parent_id   │       │ order_id    │       │ user_id     │       │ user_id     │
+│ name (JSON) │       │ product_id  │       │ product_id  │       │ order_item  │
+│ slug        │       │ quantity    │       │ rating      │       │ downloaded  │
+└─────────────┘       │ total       │       │ content     │       │ expires_at  │
+      │               └─────────────┘       └─────────────┘       └─────────────┘
+      │                      │
+      │                      │
+      ▼                      ▼
+┌──────────────────┐  ┌─────────────┐
+│ PRODUCT_CATEGORY │  │   ORDERS    │
+├──────────────────┤  ├─────────────┤
+│ product_id       │  │ id          │
+│ category_id      │  │ user_id     │
+└──────────────────┘  │ total       │
+                      │ status      │
+                      │ payment_id  │
+                      └─────────────┘
+            </code></pre>
+        </div>
+        
+        <div class="alert-info">
+            <strong>📖 Relations clés :</strong>
+            <ul class="list-disc ml-6 mt-2 text-sm">
+                <li><code>User 1:1 Store</code> : Un utilisateur vendeur possède une boutique</li>
+                <li><code>Store 1:N Product</code> : Une boutique a plusieurs produits</li>
+                <li><code>Product N:M Category</code> : Un produit peut être dans plusieurs catégories (table pivot)</li>
+                <li><code>Order 1:N OrderItem</code> : Une commande contient plusieurs articles</li>
+                <li><code>OrderItem 1:N Download</code> : Chaque article peut avoir plusieurs téléchargements</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- ========== SPRINTS DE DÉVELOPPEMENT ========== -->
+<section id="seance1-sprints" class="mb-16">
+    <h3 class="text-2xl font-semibold mb-3">1.1.3 Planning de Développement (Sprints)</h3>
+    
+    <div class="section-card">
+        <p class="text-gray-700 mb-4">
+            Le développement est organisé en <strong>10 séances</strong> (sprints) de 3-4 heures chacune.
+            Chaque sprint aboutit à une fonctionnalité utilisable.
+        </p>
+        
+        <div class="space-y-3">
+            <div class="flex items-center p-3 bg-blue-100 rounded-lg">
+                <span class="badge-seance badge-seance-1 mr-3">S1</span>
+                <div class="flex-1">
+                    <strong>Fondations & Catalogue</strong>
+                    <p class="text-sm text-gray-600">Installation, modèles Category/Product, layout Bootstrap, affichage catalogue</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center p-3 bg-blue-100 rounded-lg">
+                <span class="badge-seance badge-seance-1 mr-3">S2</span>
+                <div class="flex-1">
+                    <strong>Authentification & Rôles</strong>
+                    <p class="text-sm text-gray-600">Laravel Breeze, Spatie Permission, rôles (admin/vendor/customer), middleware</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center p-3 bg-green-100 rounded-lg">
+                <span class="badge-seance badge-seance-2 mr-3">S3</span>
+                <div class="flex-1">
+                    <strong>Multi-Vendeurs & Boutiques</strong>
+                    <p class="text-sm text-gray-600">Modèle Store, création boutique, page vendeur, vérification admin</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center p-3 bg-green-100 rounded-lg">
+                <span class="badge-seance badge-seance-2 mr-3">S4</span>
+                <div class="flex-1">
+                    <strong>Panier & Commandes</strong>
+                    <p class="text-sm text-gray-600">Panier JavaScript (localStorage), modèles Order/OrderItem, checkout</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center p-3 bg-orange-100 rounded-lg">
+                <span class="badge-seance badge-seance-3 mr-3">S5</span>
+                <div class="flex-1">
+                    <strong>Paiements (Stripe & PayPal)</strong>
+                    <p class="text-sm text-gray-600">Intégration Stripe Checkout, PayPal, webhooks, gestion statut commande</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center p-3 bg-orange-100 rounded-lg">
+                <span class="badge-seance badge-seance-3 mr-3">S6</span>
+                <div class="flex-1">
+                    <strong>Médias & Téléchargements</strong>
+                    <p class="text-sm text-gray-600">Spatie Media Library, upload images, fichiers numériques, téléchargements sécurisés</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center p-3 bg-purple-100 rounded-lg">
+                <span class="badge-seance badge-seance-4 mr-3">S7</span>
+                <div class="flex-1">
+                    <strong>Avis, Wishlist & Recherche</strong>
+                    <p class="text-sm text-gray-600">Système d'avis, wishlist JavaScript, recherche avancée avec filtres</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center p-3 bg-purple-100 rounded-lg">
+                <span class="badge-seance badge-seance-4 mr-3">S8</span>
+                <div class="flex-1">
+                    <strong>Dashboard Vendeur</strong>
+                    <p class="text-sm text-gray-600">Tableau de bord vendeur, statistiques, gestion produits, demandes paiement</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center p-3 bg-red-100 rounded-lg">
+                <span class="badge-seance badge-seance-5 mr-3">S9</span>
+                <div class="flex-1">
+                    <strong>Administration</strong>
+                    <p class="text-sm text-gray-600">Gestion utilisateurs, modération produits/avis, vérification boutiques, paramètres</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center p-3 bg-red-100 rounded-lg">
+                <span class="badge-seance badge-seance-5 mr-3">S10</span>
+                <div class="flex-1">
+                    <strong>Finalisation & Déploiement</strong>
+                    <p class="text-sm text-gray-600">Emails, SEO, tests Pest, optimisation, configuration production, déploiement</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="alert-success mt-6">
+            <strong>✅ Stack Technique :</strong> Laravel 12, Bootstrap 5, Spatie (Media Library, Permission, Translatable), 
+            Stripe/PayPal, Pest Tests
+        </div>
+    </div>
+    
+    <div class="text-right mt-8">
+        <a href="#page-top" class="text-sm font-semibold text-blue-600 hover:underline">↑ Retour en haut</a>
+    </div>
+</section>
+
 
 <!-- ========== 1.2 INSTALLATION ========== -->
 <section id="seance1-install" class="mb-16">
@@ -143,12 +383,30 @@ php artisan serve</code></pre>
 {
     Schema::<span class="token-function">create</span>(<span class="token-string">'categories'</span>, <span class="token-keyword">function</span> (Blueprint <span class="token-variable">$table</span>) {
         <span class="token-variable">$table</span>-><span class="token-function">id</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'name'</span>);
+        
+        <span class="token-comment">// Catégorie parente (pour sous-catégories)</span>
+        <span class="token-variable">$table</span>-><span class="token-function">foreignId</span>(<span class="token-string">'parent_id'</span>)
+            -><span class="token-function">nullable</span>()
+            -><span class="token-function">constrained</span>(<span class="token-string">'categories'</span>)
+            -><span class="token-function">nullOnDelete</span>();
+        
+        <span class="token-comment">// Champs JSON pour traductions (Spatie Translatable)</span>
+        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'name'</span>);
+        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'description'</span>)-><span class="token-function">nullable</span>();
+        
         <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'slug'</span>)-><span class="token-function">unique</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">text</span>(<span class="token-string">'description'</span>)-><span class="token-function">nullable</span>();
+        <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'image'</span>)-><span class="token-function">nullable</span>();
         <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'icon'</span>)-><span class="token-function">nullable</span>();
+        
         <span class="token-variable">$table</span>-><span class="token-function">boolean</span>(<span class="token-string">'is_active'</span>)-><span class="token-function">default</span>(<span class="token-keyword">true</span>);
+        <span class="token-variable">$table</span>-><span class="token-function">integer</span>(<span class="token-string">'order'</span>)-><span class="token-function">default</span>(<span class="token-number">0</span>);
+        
+        <span class="token-comment">// SEO</span>
+        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'meta_title'</span>)-><span class="token-function">nullable</span>();
+        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'meta_description'</span>)-><span class="token-function">nullable</span>();
+        
         <span class="token-variable">$table</span>-><span class="token-function">timestamps</span>();
+        <span class="token-variable">$table</span>-><span class="token-function">softDeletes</span>();
     });
 }</code></pre>
                 <button class="copy-btn">Copier</button>
@@ -156,22 +414,25 @@ php artisan serve</code></pre>
             
             <!-- Explications des champs -->
             <div class="alert-info mt-4">
-                <strong>📖 Explication des champs :</strong>
+                <strong>📖 Explication des champs avancés :</strong>
                 <ul class="list-disc ml-6 mt-2 text-sm">
-                    <li><code>id()</code> : Clé primaire auto-incrémentée</li>
-                    <li><code>name</code> : Nom de la catégorie (ex: "E-Books")</li>
-                    <li><code>slug</code> : Version URL-friendly du nom, unique (ex: "ebooks")</li>
-                    <li><code>description</code> : Description optionnelle de la catégorie</li>
-                    <li><code>icon</code> : Classe d'icône Bootstrap Icons (ex: "bi-book")</li>
-                    <li><code>is_active</code> : Permet de désactiver une catégorie sans la supprimer</li>
-                    <li><code>timestamps()</code> : Ajoute created_at et updated_at automatiquement</li>
+                    <li><code>parent_id</code> : Permet de créer une hiérarchie (catégorie → sous-catégorie)</li>
+                    <li><code>json('name')</code> : Stockage JSON pour traductions multi-langues via <strong>Spatie Translatable</strong></li>
+                    <li><code>order</code> : Permet de trier les catégories à l'affichage</li>
+                    <li><code>meta_title, meta_description</code> : Balises SEO traduisibles</li>
+                    <li><code>softDeletes()</code> : Suppression logique (les données ne sont pas vraiment effacées)</li>
                 </ul>
+            </div>
+            
+            <div class="alert-warning mt-4">
+                <strong>⚠️ Spatie Translatable :</strong> Les champs <code>json()</code> permettent de stocker 
+                les traductions. Par exemple : <code>{"fr": "Livres", "en": "Books"}</code>
             </div>
         </div>
         
         <!-- Modèle Category complet -->
         <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">Le modèle Category</h4>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">Le modèle Category (complet)</h4>
             
             <div class="code-block-wrapper">
                 <span class="code-lang">php</span>
@@ -182,33 +443,76 @@ php artisan serve</code></pre>
 <span class="token-keyword">namespace</span> <span class="token-namespace">App\Models</span>;
 
 <span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\Model</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\SoftDeletes</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\Relations\BelongsTo</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\Relations\BelongsToMany</span>;
 <span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\Relations\HasMany</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Support\Str</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">Spatie\MediaLibrary\HasMedia</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">Spatie\MediaLibrary\InteractsWithMedia</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">Spatie\Translatable\HasTranslations</span>;
 
-<span class="token-keyword">class</span> <span class="token-class-name">Category</span> <span class="token-keyword">extends</span> <span class="token-class-name">Model</span>
+<span class="token-keyword">class</span> <span class="token-class-name">Category</span> <span class="token-keyword">extends</span> <span class="token-class-name">Model</span> <span class="token-keyword">implements</span> <span class="token-class-name">HasMedia</span>
 {
+    <span class="token-keyword">use</span> SoftDeletes, InteractsWithMedia, HasTranslations;
+
+    <span class="token-comment">// Champs traduisibles</span>
+    <span class="token-keyword">public array</span> <span class="token-variable">$translatable</span> = [<span class="token-string">'name'</span>, <span class="token-string">'description'</span>, <span class="token-string">'meta_title'</span>, <span class="token-string">'meta_description'</span>];
+
     <span class="token-keyword">protected</span> <span class="token-variable">$fillable</span> = [
-        <span class="token-string">'name'</span>,
-        <span class="token-string">'slug'</span>,
-        <span class="token-string">'description'</span>,
-        <span class="token-string">'icon'</span>,
-        <span class="token-string">'is_active'</span>,
+        <span class="token-string">'parent_id'</span>, <span class="token-string">'name'</span>, <span class="token-string">'description'</span>, <span class="token-string">'slug'</span>, <span class="token-string">'image'</span>, <span class="token-string">'icon'</span>,
+        <span class="token-string">'is_active'</span>, <span class="token-string">'order'</span>, <span class="token-string">'meta_title'</span>, <span class="token-string">'meta_description'</span>,
     ];
 
-    <span class="token-comment">// Relation : Une catégorie a plusieurs produits</span>
-    <span class="token-keyword">public function</span> <span class="token-function">products</span>(): <span class="token-class-name">HasMany</span>
+    <span class="token-keyword">protected static function</span> <span class="token-function">boot</span>()
     {
-        <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">hasMany</span>(Product::<span class="token-keyword">class</span>);
+        <span class="token-keyword">parent</span>::boot();
+        <span class="token-keyword">static</span>::<span class="token-function">creating</span>(<span class="token-keyword">function</span> (<span class="token-variable">$category</span>) {
+            <span class="token-keyword">if</span> (empty(<span class="token-variable">$category</span>->slug)) {
+                <span class="token-variable">$name</span> = <span class="token-function">is_array</span>(<span class="token-variable">$category</span>->name) 
+                    ? (<span class="token-variable">$category</span>->name[<span class="token-string">'fr'</span>] ?? reset(<span class="token-variable">$category</span>->name)) 
+                    : <span class="token-variable">$category</span>->name;
+                <span class="token-variable">$category</span>->slug = Str::<span class="token-function">slug</span>(<span class="token-variable">$name</span>);
+            }
+        });
     }
+
+    <span class="token-keyword">public function</span> <span class="token-function">registerMediaCollections</span>(): <span class="token-keyword">void</span>
+    {
+        <span class="token-variable">$this</span>-><span class="token-function">addMediaCollection</span>(<span class="token-string">'image'</span>)-><span class="token-function">singleFile</span>();
+    }
+
+    <span class="token-comment">// Relations</span>
+    <span class="token-keyword">public function</span> <span class="token-function">parent</span>(): <span class="token-class-name">BelongsTo</span> { <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">belongsTo</span>(Category::<span class="token-keyword">class</span>, <span class="token-string">'parent_id'</span>); }
+    <span class="token-keyword">public function</span> <span class="token-function">children</span>(): <span class="token-class-name">HasMany</span> { <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">hasMany</span>(Category::<span class="token-keyword">class</span>, <span class="token-string">'parent_id'</span>); }
+    <span class="token-keyword">public function</span> <span class="token-function">products</span>(): <span class="token-class-name">BelongsToMany</span> { <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">belongsToMany</span>(Product::<span class="token-keyword">class</span>, <span class="token-string">'product_category'</span>); }
+
+    <span class="token-comment">// Accesseurs</span>
+    <span class="token-keyword">public function</span> <span class="token-function">getImageUrlAttribute</span>(): <span class="token-keyword">string</span>
+    {
+        <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">hasMedia</span>(<span class="token-string">'image'</span>) 
+            ? <span class="token-variable">$this</span>-><span class="token-function">getFirstMediaUrl</span>(<span class="token-string">'image'</span>) 
+            : asset(<span class="token-string">'images/default-category.jpg'</span>);
+    }
+
+    <span class="token-comment">// Scopes</span>
+    <span class="token-keyword">public function</span> <span class="token-function">scopeActive</span>(<span class="token-variable">$query</span>) { <span class="token-keyword">return</span> <span class="token-variable">$query</span>-><span class="token-function">where</span>(<span class="token-string">'is_active'</span>, <span class="token-keyword">true</span>); }
+    <span class="token-keyword">public function</span> <span class="token-function">scopeParents</span>(<span class="token-variable">$query</span>) { <span class="token-keyword">return</span> <span class="token-variable">$query</span>-><span class="token-function">whereNull</span>(<span class="token-string">'parent_id'</span>); }
+    <span class="token-keyword">public function</span> <span class="token-function">scopeOrdered</span>(<span class="token-variable">$query</span>) { <span class="token-keyword">return</span> <span class="token-variable">$query</span>-><span class="token-function">orderBy</span>(<span class="token-string">'order'</span>)-><span class="token-function">orderBy</span>(<span class="token-string">'name'</span>); }
 }</code></pre>
                 <button class="copy-btn">Copier</button>
             </div>
             
             <!-- Explications du modèle -->
             <div class="alert-info mt-4">
-                <strong>📖 Concepts clés du modèle :</strong>
+                <strong>📖 Concepts avancés du modèle :</strong>
                 <ul class="list-disc ml-6 mt-2 text-sm">
-                    <li><code>$fillable</code> : Liste les champs que l'on peut remplir via <code>create()</code> ou <code>update()</code>. C'est une protection contre l'assignation de masse (mass assignment).</li>
-                    <li><code>hasMany(Product::class)</code> : Définit la relation "Une catégorie a plusieurs produits". Eloquent génère automatiquement la requête SQL pour récupérer les produits d'une catégorie.</li>
+                    <li><code>implements HasMedia</code> : Interface pour Spatie Media Library</li>
+                    <li><code>HasTranslations</code> : Trait pour les champs multi-langues</li>
+                    <li><code>$translatable</code> : Liste les champs traduisibles</li>
+                    <li><code>boot()</code> : Génère automatiquement le slug à la création</li>
+                    <li><code>parent() / children()</code> : Relations auto-référentielles pour hiérarchie</li>
+                    <li><code>scopeActive()</code> : Permet d'écrire <code>Category::active()->get()</code></li>
                 </ul>
             </div>
         </div>
@@ -223,7 +527,7 @@ php artisan serve</code></pre>
                 <button class="copy-btn">Copier</button>
             </div>
             
-            <p class="text-gray-700 mt-4 mb-4">Migration du modèle Product :</p>
+            <p class="text-gray-700 mt-4 mb-4">Migration du modèle Product (version complète) :</p>
             
             <div class="code-block-wrapper">
                 <span class="code-lang">php</span>
@@ -233,18 +537,68 @@ php artisan serve</code></pre>
 {
     Schema::<span class="token-function">create</span>(<span class="token-string">'products'</span>, <span class="token-keyword">function</span> (Blueprint <span class="token-variable">$table</span>) {
         <span class="token-variable">$table</span>-><span class="token-function">id</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">foreignId</span>(<span class="token-string">'category_id'</span>)-><span class="token-function">constrained</span>()-><span class="token-function">cascadeOnDelete</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'name'</span>);
+        
+        <span class="token-comment">// Boutique vendeur</span>
+        <span class="token-variable">$table</span>-><span class="token-function">foreignId</span>(<span class="token-string">'store_id'</span>)-><span class="token-function">constrained</span>()-><span class="token-function">cascadeOnDelete</span>();
+        
+        <span class="token-comment">// Champs traduisibles (JSON pour Spatie Translatable)</span>
+        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'name'</span>);
         <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'slug'</span>)-><span class="token-function">unique</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">text</span>(<span class="token-string">'description'</span>)-><span class="token-function">nullable</span>();
+        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'description'</span>)-><span class="token-function">nullable</span>();
+        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'short_description'</span>)-><span class="token-function">nullable</span>();
+        
+        <span class="token-comment">// Type de produit numérique</span>
+        <span class="token-variable">$table</span>-><span class="token-function">enum</span>(<span class="token-string">'type'</span>, [<span class="token-string">'digital'</span>, <span class="token-string">'subscription'</span>, <span class="token-string">'course'</span>, <span class="token-string">'license'</span>])
+            -><span class="token-function">default</span>(<span class="token-string">'digital'</span>);
+        
+        <span class="token-comment">// Prix</span>
         <span class="token-variable">$table</span>-><span class="token-function">decimal</span>(<span class="token-string">'price'</span>, <span class="token-number">10</span>, <span class="token-number">2</span>);
-        <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'thumbnail'</span>)-><span class="token-function">nullable</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">enum</span>(<span class="token-string">'type'</span>, [<span class="token-string">'digital'</span>, <span class="token-string">'physical'</span>])-><span class="token-function">default</span>(<span class="token-string">'digital'</span>);
+        <span class="token-variable">$table</span>-><span class="token-function">decimal</span>(<span class="token-string">'compare_price'</span>, <span class="token-number">10</span>, <span class="token-number">2</span>)-><span class="token-function">nullable</span>();
+        <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'currency'</span>, <span class="token-number">3</span>)-><span class="token-function">default</span>(<span class="token-string">'EUR'</span>);
+        
+        <span class="token-comment">// Stock (pour licences limitées)</span>
+        <span class="token-variable">$table</span>-><span class="token-function">integer</span>(<span class="token-string">'stock'</span>)-><span class="token-function">nullable</span>();
+        <span class="token-variable">$table</span>-><span class="token-function">boolean</span>(<span class="token-string">'track_stock'</span>)-><span class="token-function">default</span>(<span class="token-keyword">false</span>);
+        
+        <span class="token-comment">// Fichiers</span>
+        <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'main_file'</span>)-><span class="token-function">nullable</span>();
+        <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'preview_file'</span>)-><span class="token-function">nullable</span>();
+        
+        <span class="token-comment">// Téléchargements</span>
+        <span class="token-variable">$table</span>-><span class="token-function">integer</span>(<span class="token-string">'max_downloads'</span>)-><span class="token-function">default</span>(<span class="token-number">3</span>);
+        <span class="token-variable">$table</span>-><span class="token-function">integer</span>(<span class="token-string">'download_expiry_days'</span>)-><span class="token-function">default</span>(<span class="token-number">30</span>);
+        
+        <span class="token-comment">// Statut</span>
         <span class="token-variable">$table</span>-><span class="token-function">boolean</span>(<span class="token-string">'is_active'</span>)-><span class="token-function">default</span>(<span class="token-keyword">true</span>);
+        <span class="token-variable">$table</span>-><span class="token-function">boolean</span>(<span class="token-string">'is_featured'</span>)-><span class="token-function">default</span>(<span class="token-keyword">false</span>);
+        <span class="token-variable">$table</span>-><span class="token-function">timestamp</span>(<span class="token-string">'published_at'</span>)-><span class="token-function">nullable</span>();
+        
+        <span class="token-comment">// SEO</span>
+        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'meta_title'</span>)-><span class="token-function">nullable</span>();
+        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'meta_description'</span>)-><span class="token-function">nullable</span>();
+        
+        <span class="token-comment">// Statistiques</span>
+        <span class="token-variable">$table</span>-><span class="token-function">unsignedInteger</span>(<span class="token-string">'views_count'</span>)-><span class="token-function">default</span>(<span class="token-number">0</span>);
+        <span class="token-variable">$table</span>-><span class="token-function">unsignedInteger</span>(<span class="token-string">'sales_count'</span>)-><span class="token-function">default</span>(<span class="token-number">0</span>);
+        <span class="token-variable">$table</span>-><span class="token-function">decimal</span>(<span class="token-string">'average_rating'</span>, <span class="token-number">3</span>, <span class="token-number">2</span>)-><span class="token-function">default</span>(<span class="token-number">0</span>);
+        <span class="token-variable">$table</span>-><span class="token-function">unsignedInteger</span>(<span class="token-string">'reviews_count'</span>)-><span class="token-function">default</span>(<span class="token-number">0</span>);
+        
         <span class="token-variable">$table</span>-><span class="token-function">timestamps</span>();
+        <span class="token-variable">$table</span>-><span class="token-function">softDeletes</span>();
     });
 }</code></pre>
                 <button class="copy-btn">Copier</button>
+            </div>
+            
+            <div class="alert-info mt-4">
+                <strong>📖 Champs clés de la migration :</strong>
+                <ul class="list-disc ml-6 mt-2 text-sm">
+                    <li><code>store_id</code> : Lie le produit à une boutique vendeur (marketplace multi-vendeurs)</li>
+                    <li><code>type</code> : digital, subscription, course, license</li>
+                    <li><code>compare_price</code> : Ancien prix barré (pour afficher une promotion)</li>
+                    <li><code>max_downloads / download_expiry_days</code> : Limites de téléchargement</li>
+                    <li><code>views_count, sales_count, average_rating</code> : Statistiques</li>
+                </ul>
             </div>
         </div>
         
@@ -291,15 +645,40 @@ php artisan serve</code></pre>
     }
 
     <span class="token-comment">// Accesseur pour l'URL de la miniature</span>
-    <span class="token-keyword">public function</span> <span class="token-function">getThumbnailUrlAttribute</span>(): ?<span class="token-keyword">string</span>
+    <span class="token-keyword">public function</span> <span class="token-function">getThumbnailUrlAttribute</span>(): <span class="token-keyword">string</span>
     {
+        <span class="token-comment">// Si une image a été uploadée dans le champ thumbnail</span>
         <span class="token-keyword">if</span> (<span class="token-variable">$this</span>->thumbnail) {
             <span class="token-keyword">return</span> asset(<span class="token-string">'storage/'</span> . <span class="token-variable">$this</span>->thumbnail);
         }
-        <span class="token-keyword">return</span> <span class="token-string">'https://via.placeholder.com/300x200?text=Produit'</span>;
+        
+        <span class="token-comment">// Fallback: Spatie Media Library</span>
+        <span class="token-keyword">if</span> (<span class="token-variable">$this</span>-><span class="token-function">hasMedia</span>(<span class="token-string">'thumbnail'</span>)) {
+            <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">getFirstMediaUrl</span>(<span class="token-string">'thumbnail'</span>);
+        }
+        
+        <span class="token-comment">// Images Unsplash selon le type de produit</span>
+        <span class="token-variable">$unsplashIds</span> = [
+            <span class="token-string">'digital'</span> => <span class="token-string">'1544716278-ca5e3f4abd8c'</span>,
+            <span class="token-string">'course'</span> => <span class="token-string">'1516321318423-f06f85e504b3'</span>,
+            <span class="token-string">'subscription'</span> => <span class="token-string">'1460925895917-afdab827c52f'</span>,
+            <span class="token-string">'license'</span> => <span class="token-string">'1555066931-4365d14bab8c'</span>,
+        ];
+        
+        <span class="token-variable">$imageId</span> = <span class="token-variable">$unsplashIds</span>[<span class="token-variable">$this</span>->type] ?? <span class="token-variable">$unsplashIds</span>[<span class="token-string">'digital'</span>];
+        <span class="token-keyword">return</span> <span class="token-string">"https://images.unsplash.com/photo-{$imageId}?w=400&amp;h=300&amp;fit=crop&amp;auto=format"</span>;
     }
 }</code></pre>
                 <button class="copy-btn">Copier</button>
+            </div>
+            
+            <div class="alert-info mt-4">
+                <strong>📖 Stratégie de fallback :</strong>
+                <ol class="list-decimal ml-6 mt-2 text-sm">
+                    <li>D'abord, on cherche une image uploadée manuellement (<code>thumbnail</code>)</li>
+                    <li>Sinon, on utilise Spatie Media Library (<code>hasMedia</code>)</li>
+                    <li>En dernier recours, une image Unsplash adaptée au type de produit</li>
+                </ol>
             </div>
         </div>
         
