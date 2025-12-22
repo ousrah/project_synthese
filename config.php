@@ -13,7 +13,7 @@ define('COURSE_TITLE', 'Projet de Synthèse : Marketplace de Produits Numérique
 define('COURSE_SUBTITLE', 'Construire une plateforme e-commerce multi-vendeurs complète');
 define('COURSE_AUTHOR', 'P. Rahmouni Oussama');
 define('COURSE_LAST_UPDATE', 'Décembre 2025');
-define('COURSE_DURATION', '40 heures (~10 séances de 4h)');
+define('COURSE_DURATION', '');
 
 // Structure du cours - Séances progressives
 $course_parts = [
