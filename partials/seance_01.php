@@ -347,6 +347,94 @@ php artisan serve</code></pre>
                 pour voir la page d'accueil Laravel.
             </p>
         </div>
+        
+        <!-- Nouvelle section: Installation des dépendances Composer -->
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">Étape 5 : Installer les packages Composer requis</h4>
+            <p class="text-gray-700 mb-4">
+                Notre marketplace utilise plusieurs packages Spatie essentiels. Installez-les maintenant :
+            </p>
+            
+            <div class="code-block-wrapper">
+                <span class="code-lang">bash</span>
+                <pre class="code-block"><code><span class="token-comment"># Packages Spatie essentiels</span>
+composer require spatie/laravel-medialibrary    <span class="token-comment"># Gestion des médias (images, fichiers)</span>
+composer require spatie/laravel-translatable    <span class="token-comment"># Champs multi-langues (JSON)</span>
+composer require spatie/laravel-permission      <span class="token-comment"># Rôles et permissions</span>
+composer require spatie/laravel-activitylog     <span class="token-comment"># Historique des modifications</span>
+
+<span class="token-comment"># Paiements (Stripe et PayPal)</span>
+composer require stripe/stripe-php              <span class="token-comment"># API Stripe</span>
+composer require srmklive/paypal                <span class="token-comment"># API PayPal</span>
+
+<span class="token-comment"># Authentification</span>
+composer require laravel/breeze --dev           <span class="token-comment"># UI d'authentification</span></code></pre>
+                <button class="copy-btn">Copier</button>
+            </div>
+            
+            <div class="alert-info mt-4">
+                <strong>📖 Explication des packages :</strong>
+                <ul class="list-disc ml-6 mt-2 text-sm">
+                    <li><code>spatie/laravel-medialibrary</code> : Associe des fichiers (images, PDFs) aux modèles Eloquent, génère des miniatures automatiquement</li>
+                    <li><code>spatie/laravel-translatable</code> : Permet de stocker les traductions dans des champs JSON (<code>{"fr": "...", "en": "..."}</code>)</li>
+                    <li><code>spatie/laravel-permission</code> : Système complet de rôles (admin, vendor, customer) et permissions</li>
+                    <li><code>spatie/laravel-activitylog</code> : Enregistre automatiquement les modifications sur les modèles</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Publier les migrations des packages -->
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">Étape 6 : Publier les fichiers de configuration et migrations</h4>
+            
+            <div class="code-block-wrapper">
+                <span class="code-lang">bash</span>
+                <pre class="code-block"><code><span class="token-comment"># Publier les migrations Spatie Media Library</span>
+php artisan vendor:publish --provider="Spatie\MediaLibrary\MediaLibraryServiceProvider" --tag="medialibrary-migrations"
+
+<span class="token-comment"># Publier les migrations Spatie Permission</span>
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+
+<span class="token-comment"># Publier les migrations Spatie Activity Log</span>
+php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider" --tag="activitylog-migrations"
+
+<span class="token-comment"># Créer le lien symbolique pour le stockage public</span>
+php artisan storage:link</code></pre>
+                <button class="copy-btn">Copier</button>
+            </div>
+            
+            <div class="alert-warning mt-4">
+                <strong>⚠️ Important :</strong> Ces commandes créent les tables nécessaires dans votre base de données. 
+                Elles seront exécutées avec <code>php artisan migrate</code> plus tard.
+            </div>
+        </div>
+        
+        <!-- Résumé composer.json -->
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">Récapitulatif : Votre composer.json</h4>
+            <p class="text-gray-700 mb-4">
+                Après installation, votre section <code>require</code> devrait ressembler à ceci :
+            </p>
+            
+            <div class="code-block-wrapper">
+                <span class="code-lang">json</span>
+                <pre class="code-block"><code>{
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^12.0",
+        "laravel/tinker": "^2.10",
+        "laravel/breeze": "^2.3",
+        "spatie/laravel-medialibrary": "^11.0",
+        "spatie/laravel-translatable": "^6.0",
+        "spatie/laravel-permission": "^6.0",
+        "spatie/laravel-activitylog": "^4.0",
+        "stripe/stripe-php": "^19.0",
+        "srmklive/paypal": "^3.0"
+    }
+}</code></pre>
+                <button class="copy-btn">Copier</button>
+            </div>
+        </div>
     </div>
     
     <div class="text-right mt-8">
@@ -538,8 +626,9 @@ php artisan serve</code></pre>
     Schema::<span class="token-function">create</span>(<span class="token-string">'products'</span>, <span class="token-keyword">function</span> (Blueprint <span class="token-variable">$table</span>) {
         <span class="token-variable">$table</span>-><span class="token-function">id</span>();
         
-        <span class="token-comment">// Boutique vendeur</span>
-        <span class="token-variable">$table</span>-><span class="token-function">foreignId</span>(<span class="token-string">'store_id'</span>)-><span class="token-function">constrained</span>()-><span class="token-function">cascadeOnDelete</span>();
+        <span class="token-comment">// Boutique vendeur (sera lié en Séance 3)</span>
+        <span class="token-variable">$table</span>-><span class="token-function">unsignedBigInteger</span>(<span class="token-string">'store_id'</span>)-><span class="token-function">nullable</span>();
+        <span class="token-comment">// La contrainte sera ajoutée en Séance 3 après création de la table stores</span>
         
         <span class="token-comment">// Champs traduisibles (JSON pour Spatie Translatable)</span>
         <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'name'</span>);
@@ -585,15 +674,28 @@ php artisan serve</code></pre>
         
         <span class="token-variable">$table</span>-><span class="token-function">timestamps</span>();
         <span class="token-variable">$table</span>-><span class="token-function">softDeletes</span>();
+        
+        <span class="token-comment">// Index pour optimiser les requêtes</span>
+        <span class="token-variable">$table</span>-><span class="token-function">index</span>(<span class="token-string">'store_id'</span>);
     });
 }</code></pre>
                 <button class="copy-btn">Copier</button>
             </div>
             
+            <div class="alert-warning mt-4">
+                <strong>⚠️ Note importante :</strong> Le champ <code>store_id</code> est créé sans contrainte de clé étrangère 
+                car la table <code>stores</code> n'existe pas encore. En <strong>Séance 3</strong>, nous créerons la table 
+                <code>stores</code> et ajouterons la contrainte avec une migration séparée :
+                <pre class="bg-yellow-50 p-2 mt-2 rounded text-sm overflow-x-auto"><code>// Séance 3 : add_foreign_key_to_products
+Schema::table('products', function (Blueprint $table) {
+    $table->foreign('store_id')->references('id')->on('stores')->cascadeOnDelete();
+});</code></pre>
+            </div>
+            
             <div class="alert-info mt-4">
                 <strong>📖 Champs clés de la migration :</strong>
                 <ul class="list-disc ml-6 mt-2 text-sm">
-                    <li><code>store_id</code> : Lie le produit à une boutique vendeur (marketplace multi-vendeurs)</li>
+                    <li><code>store_id</code> : Sera lié à une boutique vendeur (Séance 3)</li>
                     <li><code>type</code> : digital, subscription, course, license</li>
                     <li><code>compare_price</code> : Ancien prix barré (pour afficher une promotion)</li>
                     <li><code>max_downloads / download_expiry_days</code> : Limites de téléchargement</li>
