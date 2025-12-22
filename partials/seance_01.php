@@ -706,7 +706,7 @@ Schema::table('products', function (Blueprint $table) {
         
         <!-- Modèle Product complet -->
         <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">Le modèle Product</h4>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">Le modèle Product (complet)</h4>
             
             <div class="code-block-wrapper">
                 <span class="code-lang">php</span>
@@ -717,70 +717,97 @@ Schema::table('products', function (Blueprint $table) {
 <span class="token-keyword">namespace</span> <span class="token-namespace">App\Models</span>;
 
 <span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\Model</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\SoftDeletes</span>;
 <span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\Relations\BelongsTo</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\Relations\BelongsToMany</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Support\Str</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">Spatie\MediaLibrary\HasMedia</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">Spatie\MediaLibrary\InteractsWithMedia</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">Spatie\Translatable\HasTranslations</span>;
 
-<span class="token-keyword">class</span> <span class="token-class-name">Product</span> <span class="token-keyword">extends</span> <span class="token-class-name">Model</span>
+<span class="token-keyword">class</span> <span class="token-class-name">Product</span> <span class="token-keyword">extends</span> <span class="token-class-name">Model</span> <span class="token-keyword">implements</span> <span class="token-class-name">HasMedia</span>
 {
+    <span class="token-keyword">use</span> SoftDeletes, InteractsWithMedia, HasTranslations;
+
+    <span class="token-comment">// Champs traduisibles</span>
+    <span class="token-keyword">public array</span> <span class="token-variable">$translatable</span> = [<span class="token-string">'name'</span>, <span class="token-string">'description'</span>, <span class="token-string">'short_description'</span>];
+
     <span class="token-keyword">protected</span> <span class="token-variable">$fillable</span> = [
-        <span class="token-string">'category_id'</span>,
-        <span class="token-string">'name'</span>,
-        <span class="token-string">'slug'</span>,
-        <span class="token-string">'description'</span>,
-        <span class="token-string">'price'</span>,
-        <span class="token-string">'thumbnail'</span>,
-        <span class="token-string">'type'</span>,
-        <span class="token-string">'is_active'</span>,
+        <span class="token-string">'store_id'</span>, <span class="token-string">'name'</span>, <span class="token-string">'slug'</span>, <span class="token-string">'description'</span>, <span class="token-string">'short_description'</span>,
+        <span class="token-string">'type'</span>, <span class="token-string">'price'</span>, <span class="token-string">'compare_price'</span>, <span class="token-string">'currency'</span>,
+        <span class="token-string">'is_active'</span>, <span class="token-string">'is_featured'</span>, <span class="token-string">'published_at'</span>,
+        <span class="token-string">'max_downloads'</span>, <span class="token-string">'download_expiry_days'</span>,
     ];
 
     <span class="token-keyword">protected function</span> <span class="token-function">casts</span>(): <span class="token-keyword">array</span>
     {
         <span class="token-keyword">return</span> [
             <span class="token-string">'price'</span> => <span class="token-string">'decimal:2'</span>,
+            <span class="token-string">'compare_price'</span> => <span class="token-string">'decimal:2'</span>,
             <span class="token-string">'is_active'</span> => <span class="token-string">'boolean'</span>,
+            <span class="token-string">'is_featured'</span> => <span class="token-string">'boolean'</span>,
+            <span class="token-string">'published_at'</span> => <span class="token-string">'datetime'</span>,
         ];
     }
 
-    <span class="token-comment">// Relation : Un produit appartient à une catégorie</span>
-    <span class="token-keyword">public function</span> <span class="token-function">category</span>(): <span class="token-class-name">BelongsTo</span>
+    <span class="token-keyword">protected static function</span> <span class="token-function">boot</span>()
     {
-        <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">belongsTo</span>(Category::<span class="token-keyword">class</span>);
+        <span class="token-keyword">parent</span>::boot();
+        <span class="token-keyword">static</span>::<span class="token-function">creating</span>(<span class="token-keyword">function</span> (<span class="token-variable">$product</span>) {
+            <span class="token-keyword">if</span> (empty(<span class="token-variable">$product</span>->slug)) {
+                <span class="token-variable">$name</span> = is_array(<span class="token-variable">$product</span>->name) 
+                    ? (<span class="token-variable">$product</span>->name[<span class="token-string">'fr'</span>] ?? reset(<span class="token-variable">$product</span>->name)) 
+                    : <span class="token-variable">$product</span>->name;
+                <span class="token-variable">$product</span>->slug = Str::<span class="token-function">slug</span>(<span class="token-variable">$name</span>);
+            }
+        });
+    }
+
+    <span class="token-comment">// Relations</span>
+    <span class="token-keyword">public function</span> <span class="token-function">store</span>(): <span class="token-class-name">BelongsTo</span> 
+    { 
+        <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">belongsTo</span>(Store::<span class="token-keyword">class</span>); 
+    }
+    
+    <span class="token-comment">// Relation Many-to-Many avec les catégories</span>
+    <span class="token-keyword">public function</span> <span class="token-function">categories</span>(): <span class="token-class-name">BelongsToMany</span> 
+    { 
+        <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">belongsToMany</span>(Category::<span class="token-keyword">class</span>, <span class="token-string">'product_category'</span>); 
     }
 
     <span class="token-comment">// Accesseur pour l'URL de la miniature</span>
     <span class="token-keyword">public function</span> <span class="token-function">getThumbnailUrlAttribute</span>(): <span class="token-keyword">string</span>
     {
-        <span class="token-comment">// Si une image a été uploadée dans le champ thumbnail</span>
-        <span class="token-keyword">if</span> (<span class="token-variable">$this</span>->thumbnail) {
-            <span class="token-keyword">return</span> asset(<span class="token-string">'storage/'</span> . <span class="token-variable">$this</span>->thumbnail);
-        }
-        
-        <span class="token-comment">// Fallback: Spatie Media Library</span>
         <span class="token-keyword">if</span> (<span class="token-variable">$this</span>-><span class="token-function">hasMedia</span>(<span class="token-string">'thumbnail'</span>)) {
             <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">getFirstMediaUrl</span>(<span class="token-string">'thumbnail'</span>);
         }
         
-        <span class="token-comment">// Images Unsplash selon le type de produit</span>
+        <span class="token-comment">// Fallback: Images Unsplash selon le type</span>
         <span class="token-variable">$unsplashIds</span> = [
             <span class="token-string">'digital'</span> => <span class="token-string">'1544716278-ca5e3f4abd8c'</span>,
             <span class="token-string">'course'</span> => <span class="token-string">'1516321318423-f06f85e504b3'</span>,
             <span class="token-string">'subscription'</span> => <span class="token-string">'1460925895917-afdab827c52f'</span>,
             <span class="token-string">'license'</span> => <span class="token-string">'1555066931-4365d14bab8c'</span>,
         ];
-        
         <span class="token-variable">$imageId</span> = <span class="token-variable">$unsplashIds</span>[<span class="token-variable">$this</span>->type] ?? <span class="token-variable">$unsplashIds</span>[<span class="token-string">'digital'</span>];
-        <span class="token-keyword">return</span> <span class="token-string">"https://images.unsplash.com/photo-{$imageId}?w=400&amp;h=300&amp;fit=crop&amp;auto=format"</span>;
+        <span class="token-keyword">return</span> <span class="token-string">"https://images.unsplash.com/photo-{$imageId}?w=400&amp;h=300&amp;fit=crop"</span>;
     }
+    
+    <span class="token-comment">// Scopes</span>
+    <span class="token-keyword">public function</span> <span class="token-function">scopeActive</span>(<span class="token-variable">$query</span>) { <span class="token-keyword">return</span> <span class="token-variable">$query</span>-><span class="token-function">where</span>(<span class="token-string">'is_active'</span>, <span class="token-keyword">true</span>); }
+    <span class="token-keyword">public function</span> <span class="token-function">scopeFeatured</span>(<span class="token-variable">$query</span>) { <span class="token-keyword">return</span> <span class="token-variable">$query</span>-><span class="token-function">where</span>(<span class="token-string">'is_featured'</span>, <span class="token-keyword">true</span>); }
 }</code></pre>
                 <button class="copy-btn">Copier</button>
             </div>
             
             <div class="alert-info mt-4">
-                <strong>📖 Stratégie de fallback :</strong>
-                <ol class="list-decimal ml-6 mt-2 text-sm">
-                    <li>D'abord, on cherche une image uploadée manuellement (<code>thumbnail</code>)</li>
-                    <li>Sinon, on utilise Spatie Media Library (<code>hasMedia</code>)</li>
-                    <li>En dernier recours, une image Unsplash adaptée au type de produit</li>
-                </ol>
+                <strong>📖 Points clés du modèle Product :</strong>
+                <ul class="list-disc ml-6 mt-2 text-sm">
+                    <li><code>HasTranslations</code> : name, description sont des tableaux JSON multi-langues</li>
+                    <li><code>store()</code> : Relation vers la boutique (sera null en Séance 1, lié en Séance 3)</li>
+                    <li><code>categories()</code> : Relation <strong>Many-to-Many</strong> via table pivot <code>product_category</code></li>
+                    <li><code>boot()</code> : Génère automatiquement le slug à partir du nom français</li>
+                </ul>
             </div>
         </div>
         
@@ -828,6 +855,7 @@ Schema::table('products', function (Blueprint $table) {
 
 <span class="token-keyword">namespace</span> <span class="token-namespace">Database\Seeders</span>;
 
+<span class="token-keyword">use</span> <span class="token-class-name">App\Models\Category</span>;
 <span class="token-keyword">use</span> <span class="token-class-name">App\Models\Product</span>;
 <span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Seeder</span>;
 
@@ -837,34 +865,69 @@ Schema::table('products', function (Blueprint $table) {
     {
         <span class="token-variable">$products</span> = [
             [
-                <span class="token-string">'category_id'</span> => <span class="token-number">1</span>,
-                <span class="token-string">'name'</span> => <span class="token-string">'Guide Laravel 12'</span>,
-                <span class="token-string">'slug'</span> => <span class="token-string">'guide-laravel-12'</span>,
-                <span class="token-string">'description'</span> => <span class="token-string">'Le guide complet pour maîtriser Laravel 12'</span>,
-                <span class="token-string">'price'</span> => <span class="token-number">29.99</span>,
+                <span class="token-string">'category_slug'</span> =&gt; <span class="token-string">'developpement-web'</span>,
+                <span class="token-comment">// Champs JSON pour Translatable</span>
+                <span class="token-string">'name'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'Guide Laravel 12'</span>, <span class="token-string">'en'</span> =&gt; <span class="token-string">'Laravel 12 Guide'</span>],
+                <span class="token-string">'description'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'Le guide complet pour maîtriser Laravel 12'</span>],
+                <span class="token-string">'type'</span> =&gt; <span class="token-string">'course'</span>,
+                <span class="token-string">'price'</span> =&gt; <span class="token-number">29.99</span>,
             ],
             [
-                <span class="token-string">'category_id'</span> => <span class="token-number">2</span>,
-                <span class="token-string">'name'</span> => <span class="token-string">'DevTools Pro'</span>,
-                <span class="token-string">'slug'</span> => <span class="token-string">'devtools-pro'</span>,
-                <span class="token-string">'description'</span> => <span class="token-string">'Suite d\'outils pour développeurs'</span>,
-                <span class="token-string">'price'</span> => <span class="token-number">49.99</span>,
+                <span class="token-string">'category_slug'</span> =&gt; <span class="token-string">'scripts-outils'</span>,
+                <span class="token-string">'name'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'DevTools Pro'</span>, <span class="token-string">'en'</span> =&gt; <span class="token-string">'DevTools Pro'</span>],
+                <span class="token-string">'description'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'Suite d\'outils pour développeurs'</span>],
+                <span class="token-string">'type'</span> =&gt; <span class="token-string">'license'</span>,
+                <span class="token-string">'price'</span> =&gt; <span class="token-number">49.99</span>,
             ],
             [
-                <span class="token-string">'category_id'</span> => <span class="token-number">3</span>,
-                <span class="token-string">'name'</span> => <span class="token-string">'Template Dashboard'</span>,
-                <span class="token-string">'slug'</span> => <span class="token-string">'template-dashboard'</span>,
-                <span class="token-string">'description'</span> => <span class="token-string">'Template admin moderne avec Bootstrap'</span>,
-                <span class="token-string">'price'</span> => <span class="token-number">19.99</span>,
+                <span class="token-string">'category_slug'</span> =&gt; <span class="token-string">'templates-laravel'</span>,
+                <span class="token-string">'name'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'Template Dashboard'</span>, <span class="token-string">'en'</span> =&gt; <span class="token-string">'Dashboard Template'</span>],
+                <span class="token-string">'description'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'Template admin moderne avec Bootstrap'</span>],
+                <span class="token-string">'type'</span> =&gt; <span class="token-string">'digital'</span>,
+                <span class="token-string">'price'</span> =&gt; <span class="token-number">19.99</span>,
             ],
         ];
 
-        <span class="token-keyword">foreach</span> (<span class="token-variable">$products</span> <span class="token-keyword">as</span> <span class="token-variable">$product</span>) {
-            Product::<span class="token-function">create</span>(<span class="token-variable">$product</span>);
+        <span class="token-keyword">foreach</span> (<span class="token-variable">$products</span> <span class="token-keyword">as</span> <span class="token-variable">$productData</span>) {
+            <span class="token-comment">// Récupérer la catégorie par son slug</span>
+            <span class="token-variable">$category</span> = Category::<span class="token-function">where</span>(<span class="token-string">'slug'</span>, <span class="token-variable">$productData</span>[<span class="token-string">'category_slug'</span>])-&gt;<span class="token-function">first</span>();
+            <span class="token-function">unset</span>(<span class="token-variable">$productData</span>[<span class="token-string">'category_slug'</span>]);
+
+            <span class="token-comment">// Créer le produit (store_id sera null, lié en Séance 3)</span>
+            <span class="token-variable">$product</span> = Product::<span class="token-function">create</span>([
+                ...<span class="token-variable">$productData</span>,
+                <span class="token-string">'short_description'</span> =&gt; <span class="token-variable">$productData</span>[<span class="token-string">'description'</span>],
+                <span class="token-string">'is_active'</span> =&gt; <span class="token-keyword">true</span>,
+                <span class="token-string">'published_at'</span> =&gt; <span class="token-function">now</span>(),
+            ]);
+
+            <span class="token-comment">// Attacher la catégorie via la table pivot (relation N:M)</span>
+            <span class="token-keyword">if</span> (<span class="token-variable">$category</span>) {
+                <span class="token-variable">$product</span>-&gt;<span class="token-function">categories</span>()-&gt;<span class="token-function">attach</span>(<span class="token-variable">$category</span>-&gt;id);
+            }
         }
     }
 }</code></pre>
                 <button class="copy-btn">Copier</button>
+            </div>
+            
+            <div class="alert-warning mt-4">
+                <strong>⚠️ Attention :</strong> 
+                <ul class="list-disc ml-6 mt-2 text-sm">
+                    <li>Les champs <code>name</code> et <code>description</code> sont des tableaux JSON (Spatie Translatable)</li>
+                    <li>Le <code>store_id</code> est <code>null</code> pour l'instant (sera assigné en Séance 3)</li>
+                    <li>La relation catégorie utilise <code>attach()</code> car c'est une relation Many-to-Many</li>
+                </ul>
+            </div>
+            
+            <div class="alert-info mt-4">
+                <strong>📖 Table pivot product_category :</strong> N'oubliez pas de créer cette migration :
+                <pre class="bg-blue-50 p-2 mt-2 rounded text-xs overflow-x-auto"><code>// database/migrations/xxxx_create_product_category_table.php
+Schema::create('product_category', function (Blueprint $table) {
+    $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+    $table->foreignId('category_id')->constrained()->cascadeOnDelete();
+    $table->primary(['product_id', 'category_id']);
+});</code></pre>
             </div>
         </div>
         
