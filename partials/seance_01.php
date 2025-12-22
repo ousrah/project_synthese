@@ -831,12 +831,13 @@ Schema::table('products', function (Blueprint $table) {
 {
     <span class="token-keyword">public function</span> <span class="token-function">run</span>(): <span class="token-keyword">void</span>
     {
+        <span class="token-comment">// Champs JSON pour Translatable</span>
         <span class="token-variable">$categories</span> = [
-            [<span class="token-string">'name'</span> => <span class="token-string">'E-Books'</span>, <span class="token-string">'slug'</span> => <span class="token-string">'ebooks'</span>, <span class="token-string">'icon'</span> => <span class="token-string">'bi-book'</span>],
-            [<span class="token-string">'name'</span> => <span class="token-string">'Logiciels'</span>, <span class="token-string">'slug'</span> => <span class="token-string">'software'</span>, <span class="token-string">'icon'</span> => <span class="token-string">'bi-cpu'</span>],
-            [<span class="token-string">'name'</span> => <span class="token-string">'Templates'</span>, <span class="token-string">'slug'</span> => <span class="token-string">'templates'</span>, <span class="token-string">'icon'</span> => <span class="token-string">'bi-layout-wtf'</span>],
-            [<span class="token-string">'name'</span> => <span class="token-string">'Musique'</span>, <span class="token-string">'slug'</span> => <span class="token-string">'music'</span>, <span class="token-string">'icon'</span> => <span class="token-string">'bi-music-note'</span>],
-            [<span class="token-string">'name'</span> => <span class="token-string">'Graphisme'</span>, <span class="token-string">'slug'</span> => <span class="token-string">'graphics'</span>, <span class="token-string">'icon'</span> => <span class="token-string">'bi-palette'</span>],
+            [<span class="token-string">'name'</span> => [<span class="token-string">'fr'</span> => <span class="token-string">'E-Books'</span>], <span class="token-string">'slug'</span> => <span class="token-string">'ebooks'</span>, <span class="token-string">'icon'</span> => <span class="token-string">'bi-book'</span>],
+            [<span class="token-string">'name'</span> => [<span class="token-string">'fr'</span> => <span class="token-string">'Logiciels'</span>], <span class="token-string">'slug'</span> => <span class="token-string">'software'</span>, <span class="token-string">'icon'</span> => <span class="token-string">'bi-cpu'</span>],
+            [<span class="token-string">'name'</span> => [<span class="token-string">'fr'</span> => <span class="token-string">'Templates'</span>], <span class="token-string">'slug'</span> => <span class="token-string">'templates'</span>, <span class="token-string">'icon'</span> => <span class="token-string">'bi-layout-wtf'</span>],
+            [<span class="token-string">'name'</span> => [<span class="token-string">'fr'</span> => <span class="token-string">'Musique'</span>], <span class="token-string">'slug'</span> => <span class="token-string">'music'</span>, <span class="token-string">'icon'</span> => <span class="token-string">'bi-music-note'</span>],
+            [<span class="token-string">'name'</span> => [<span class="token-string">'fr'</span> => <span class="token-string">'Graphisme'</span>], <span class="token-string">'slug'</span> => <span class="token-string">'graphics'</span>, <span class="token-string">'icon'</span> => <span class="token-string">'bi-palette'</span>],
         ];
 
         <span class="token-keyword">foreach</span> (<span class="token-variable">$categories</span> <span class="token-keyword">as</span> <span class="token-variable">$category</span>) {
@@ -865,7 +866,7 @@ Schema::table('products', function (Blueprint $table) {
     {
         <span class="token-variable">$products</span> = [
             [
-                <span class="token-string">'category_slug'</span> =&gt; <span class="token-string">'developpement-web'</span>,
+                <span class="token-string">'category_slug'</span> =&gt; <span class="token-string">'ebooks'</span>,  <span class="token-comment">// Doit correspondre au slug dans CategorySeeder</span>
                 <span class="token-comment">// Champs JSON pour Translatable</span>
                 <span class="token-string">'name'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'Guide Laravel 12'</span>, <span class="token-string">'en'</span> =&gt; <span class="token-string">'Laravel 12 Guide'</span>],
                 <span class="token-string">'description'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'Le guide complet pour maîtriser Laravel 12'</span>],
@@ -873,14 +874,14 @@ Schema::table('products', function (Blueprint $table) {
                 <span class="token-string">'price'</span> =&gt; <span class="token-number">29.99</span>,
             ],
             [
-                <span class="token-string">'category_slug'</span> =&gt; <span class="token-string">'scripts-outils'</span>,
+                <span class="token-string">'category_slug'</span> =&gt; <span class="token-string">'software'</span>,  <span class="token-comment">// Doit correspondre au slug dans CategorySeeder</span>
                 <span class="token-string">'name'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'DevTools Pro'</span>, <span class="token-string">'en'</span> =&gt; <span class="token-string">'DevTools Pro'</span>],
                 <span class="token-string">'description'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'Suite d\'outils pour développeurs'</span>],
                 <span class="token-string">'type'</span> =&gt; <span class="token-string">'license'</span>,
                 <span class="token-string">'price'</span> =&gt; <span class="token-number">49.99</span>,
             ],
             [
-                <span class="token-string">'category_slug'</span> =&gt; <span class="token-string">'templates-laravel'</span>,
+                <span class="token-string">'category_slug'</span> =&gt; <span class="token-string">'templates'</span>,  <span class="token-comment">// Doit correspondre au slug dans CategorySeeder</span>
                 <span class="token-string">'name'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'Template Dashboard'</span>, <span class="token-string">'en'</span> =&gt; <span class="token-string">'Dashboard Template'</span>],
                 <span class="token-string">'description'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'Template admin moderne avec Bootstrap'</span>],
                 <span class="token-string">'type'</span> =&gt; <span class="token-string">'digital'</span>,
@@ -1069,12 +1070,12 @@ php artisan migrate:fresh --seed</code></pre>
     <span class="token-comment">// Liste des produits</span>
     <span class="token-keyword">public function</span> <span class="token-function">index</span>(Request <span class="token-variable">$request</span>)
     {
-        <span class="token-variable">$query</span> = Product::<span class="token-function">with</span>(<span class="token-string">'category'</span>)
+        <span class="token-variable">$query</span> = Product::<span class="token-function">with</span>(<span class="token-string">'categories'</span>)
             -><span class="token-function">where</span>(<span class="token-string">'is_active'</span>, <span class="token-keyword">true</span>);
 
-        <span class="token-comment">// Filtrer par catégorie si demandé</span>
+        <span class="token-comment">// Filtrer par catégorie si demandé (relation Many-to-Many)</span>
         <span class="token-keyword">if</span> (<span class="token-variable">$request</span>-><span class="token-function">has</span>(<span class="token-string">'category'</span>)) {
-            <span class="token-variable">$query</span>-><span class="token-function">where</span>(<span class="token-string">'category_id'</span>, <span class="token-variable">$request</span>->category);
+            <span class="token-variable">$query</span>-><span class="token-function">whereHas</span>(<span class="token-string">'categories'</span>, <span class="token-function">fn</span>(<span class="token-variable">$q</span>) => <span class="token-variable">$q</span>-><span class="token-function">where</span>(<span class="token-string">'categories.id'</span>, <span class="token-variable">$request</span>->category));
         }
 
         <span class="token-variable">$products</span> = <span class="token-variable">$query</span>-><span class="token-function">paginate</span>(<span class="token-number">12</span>);
@@ -1147,7 +1148,7 @@ Route::<span class="token-function">get</span>(<span class="token-string">'/prod
                          alt="<span class="token-blade">{{ $product->name }}</span>"
                          style="height: 180px; object-fit: cover;"&gt;
                     &lt;div class="card-body d-flex flex-column"&gt;
-                        &lt;span class="badge bg-secondary mb-2"&gt;<span class="token-blade">{{ $product->category->name }}</span>&lt;/span&gt;
+                        &lt;span class="badge bg-secondary mb-2"&gt;<span class="token-blade">{{ $product->categories->first()?->name ?? 'Sans catégorie' }}</span>&lt;/span&gt;
                         &lt;h5 class="card-title"&gt;<span class="token-blade">{{ $product->name }}</span>&lt;/h5&gt;
                         &lt;p class="text-primary fw-bold"&gt;<span class="token-blade">{{ number_format($product->price, 2) }}</span> €&lt;/p&gt;
                         &lt;a href="<span class="token-blade">{{ route('products.show', $product) }}</span>" class="btn btn-outline-primary mt-auto"&gt;
@@ -1212,7 +1213,7 @@ Route::<span class="token-function">get</span>(<span class="token-string">'/prod
     <span class="token-keyword">public function</span> <span class="token-function">index</span>()
     {
         <span class="token-comment">// Récupérer les 4 derniers produits</span>
-        <span class="token-variable">$latestProducts</span> = Product::<span class="token-function">with</span>(<span class="token-string">'category'</span>)
+        <span class="token-variable">$latestProducts</span> = Product::<span class="token-function">with</span>(<span class="token-string">'categories'</span>)
             -><span class="token-function">where</span>(<span class="token-string">'is_active'</span>, <span class="token-keyword">true</span>)
             -><span class="token-function">latest</span>()
             -><span class="token-function">take</span>(<span class="token-number">4</span>)
@@ -1270,7 +1271,7 @@ Route::<span class="token-function">get</span>(<span class="token-string">'/'</s
                         &lt;img src="<span class="token-blade">{{ $product-&gt;thumbnail_url }}</span>" 
                              class="card-img-top" style="height: 150px; object-fit: cover;"&gt;
                         &lt;div class="card-body"&gt;
-                            &lt;span class="badge bg-secondary"&gt;<span class="token-blade">{{ $product-&gt;category-&gt;name }}</span>&lt;/span&gt;
+                            &lt;span class="badge bg-secondary"&gt;<span class="token-blade">{{ $product-&gt;categories-&gt;first()?-&gt;name ?? 'Sans catégorie' }}</span>&lt;/span&gt;
                             &lt;h5 class="card-title mt-2"&gt;<span class="token-blade">{{ $product-&gt;name }}</span>&lt;/h5&gt;
                             &lt;p class="text-primary fw-bold"&gt;<span class="token-blade">{{ number_format($product-&gt;price, 2) }}</span> €&lt;/p&gt;
                             &lt;a href="<span class="token-blade">{{ route('products.show', $product) }}</span>" class="btn btn-outline-primary btn-sm"&gt;
