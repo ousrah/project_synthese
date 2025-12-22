@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     
     <!-- Styles personnalisés -->
-    <link href="../style.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
     
     <!-- Barre de progression de lecture -->
     <style>
