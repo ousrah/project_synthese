@@ -430,6 +430,87 @@ Route::<span class="token-function">middleware</span>([<span class="token-string
             </div>
         </div>
     </div>
+</section>
+
+<!-- ========== 2.5 NAVIGATION (LOGOUT) ========== -->
+<section id="seance2-navigation" class="mb-16">
+    <h3 class="text-2xl font-semibold mb-3">2.5 Mise à jour de la Navigation</h3>
+    
+    <div class="section-card space-y-6">
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">Ajouter les liens Connexion / Déconnexion</h4>
+            <p class="text-gray-700 mb-4">
+                Nous allons mettre en place une logique conditionnelle dans la barre de navigation :
+                <ul class="list-disc ml-6 mt-2 mb-4 text-sm">
+                    <li><strong>Si visiteur (@guest)</strong> : Afficher les boutons "Connexion" et "Inscription".</li>
+                    <li><strong>Si connecté (@auth)</strong> : Afficher le nom de l'utilisateur et un menu déroulant contenant le bouton "Déconnexion".</li>
+                </ul>
+            </p>
+            
+            <div class="code-block-wrapper">
+                <span class="code-lang">blade</span>
+                <pre class="code-block"><code><span class="token-comment">&lt;!-- resources/views/components/layouts/app.blade.php --&gt;</span>
+
+<span class="token-comment">&lt;!-- Remplacez la partie &lt;ul class="navbar-nav ms-auto"&gt; ... &lt;/ul&gt; par : --&gt;</span>
+&lt;ul class="navbar-nav ms-auto"&gt;
+    &lt;li class="nav-item"&gt;
+        &lt;a class="nav-link" href="<span class="token-blade">{{ route('products.index') }}</span>"&gt;Produits&lt;/a&gt;
+    &lt;/li&gt;
+    &lt;li class="nav-item"&gt;
+        &lt;a class="nav-link" href="#"&gt;
+            &lt;i class="bi bi-cart"&gt;&lt;/i&gt; Panier
+        &lt;/a&gt;
+    &lt;/li&gt;
+
+    <span class="token-blade">@guest</span>
+        &lt;li class="nav-item ms-2"&gt;
+            &lt;a class="nav-link btn btn-sm btn-outline-light px-3" href="<span class="token-blade">{{ route('login') }}</span>"&gt;Connexion&lt;/a&gt;
+        &lt;/li&gt;
+        &lt;li class="nav-item ms-2"&gt;
+            &lt;a class="nav-link btn btn-sm btn-light text-dark px-3" href="<span class="token-blade">{{ route('register') }}</span>"&gt;Inscription&lt;/a&gt;
+        &lt;/li&gt;
+    <span class="token-blade">@endguest</span>
+
+    <span class="token-blade">@auth</span>
+        &lt;li class="nav-item dropdown ms-2"&gt;
+            &lt;a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"&gt;
+                <span class="token-blade">{{ Auth::user()->name }}</span> 
+                &lt;span class="badge bg-secondary ms-1"&gt;<span class="token-blade">{{ Auth::user()->role }}</span>&lt;/span&gt;
+            &lt;/a&gt;
+            &lt;ul class="dropdown-menu dropdown-menu-end"&gt;
+                &lt;li&gt;
+                    <span class="token-comment">&lt;!-- Lien dynamique vers le bon dashboard --&gt;</span>
+                    &lt;a class="dropdown-item" href="<span class="token-blade">{{ match(Auth::user()->role) {
+                        'admin' => route('admin.dashboard'),
+                        'vendor' => route('vendor.dashboard'),
+                        default => route('dashboard'),
+                    } }}</span>"&gt;
+                        &lt;i class="bi bi-speedometer2 me-2"&gt;&lt;/i&gt;Tableau de bord
+                    &lt;/a&gt;
+                &lt;/li&gt;
+                &lt;li&gt;&lt;hr class="dropdown-divider"&gt;&lt;/li&gt;
+                &lt;li&gt;
+                    <span class="token-comment">&lt;!-- Formulaire de Déconnexion --&gt;</span>
+                    &lt;form method="POST" action="<span class="token-blade">{{ route('logout') }}</span>"&gt;
+                        <span class="token-blade">@csrf</span>
+                        &lt;button type="submit" class="dropdown-item text-danger"&gt;
+                            &lt;i class="bi bi-box-arrow-right me-2"&gt;&lt;/i&gt;Déconnexion
+                        &lt;/button&gt;
+                    &lt;/form&gt;
+                &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/li&gt;
+    <span class="token-blade">@endauth</span>
+&lt;/ul&gt;</code></pre>
+                <button class="copy-btn">Copier</button>
+            </div>
+            
+            <div class="alert-info mt-4">
+                <strong>💡 Astuce :</strong> Nous utilisons l'expression <code>match</code> de PHP 8 pour rediriger 
+                automatiquement vers le bon dashboard dans le menu.
+            </div>
+        </div>
+    </div>
     
     <div class="alert-success mt-8">
         <strong>🎉 Fin de la Séance 2 !</strong> Vous avez maintenant un système d'authentification
