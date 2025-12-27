@@ -168,6 +168,49 @@ php artisan migrate</code></pre>
                 <button class="copy-btn">Copier</button>
             </div>
         </div>
+
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">Appeler le Seeder dans DatabaseSeeder</h4>
+            <p class="text-gray-700 mb-4">
+                N'oubliez pas d'enregistrer votre seeder dans le fichier principal <code>DatabaseSeeder.php</code> :
+            </p>
+            
+            <div class="code-block-wrapper">
+                <span class="code-lang">php</span>
+                <pre class="code-block"><code><span class="token-comment">// database/seeders/DatabaseSeeder.php</span>
+
+<span class="token-keyword">public function</span> <span class="token-function">run</span>(): <span class="token-keyword">void</span>
+{
+    <span class="token-variable">$this</span>-><span class="token-function">call</span>([
+        UserSeeder::<span class="token-keyword">class</span>,
+        <span class="token-comment">// ... autres seeders plus tard</span>
+    ]);
+}</code></pre>
+                <button class="copy-btn">Copier</button>
+            </div>
+        </div>
+
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">🚀 Appliquer les changements</h4>
+            <p class="text-gray-700 mb-4">
+                Maintenant que tout est prêt, exécutez la migration pour modifier la table utilisateurs, puis lancez les seeders pour créer les comptes de test :
+            </p>
+            
+            <div class="code-block-wrapper">
+                <span class="code-lang">bash</span>
+                <pre class="code-block"><code><span class="token-comment"># Exécuter la migration (ajoute la colonne role)</span>
+php artisan migrate
+
+<span class="token-comment"># Lancer les seeders (crée les users test)</span>
+php artisan db:seed --class=UserSeeder</code></pre>
+                <button class="copy-btn">Copier</button>
+            </div>
+            
+            <div class="alert-success mt-4">
+                <strong>💡 Astuce :</strong> Si vous voulez repartir de zéro (supprimer toutes les données et recréer), utilisez :
+                <br><code>php artisan migrate:fresh --seed</code>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -196,14 +239,14 @@ php artisan migrate</code></pre>
             
             <div class="code-block-wrapper">
                 <span class="code-lang">bash</span>
-                <pre class="code-block"><code>php artisan make:middleware AdminMiddleware
-php artisan make:middleware VendorMiddleware</code></pre>
+                <pre class="code-block"><code>php artisan make:middleware EnsureUserIsAdmin
+php artisan make:middleware EnsureUserIsVendor</code></pre>
                 <button class="copy-btn">Copier</button>
             </div>
             
             <div class="code-block-wrapper mt-4">
                 <span class="code-lang">php</span>
-                <pre class="code-block"><code><span class="token-comment">// app/Http/Middleware/AdminMiddleware.php</span>
+                <pre class="code-block"><code><span class="token-comment">// app/Http/Middleware/EnsureUserIsAdmin.php</span>
 
 <span class="token-preprocessor">&lt;?php</span>
 
@@ -212,7 +255,7 @@ php artisan make:middleware VendorMiddleware</code></pre>
 <span class="token-keyword">use</span> <span class="token-class-name">Closure</span>;
 <span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Http\Request</span>;
 
-<span class="token-keyword">class</span> <span class="token-class-name">AdminMiddleware</span>
+<span class="token-keyword">class</span> <span class="token-class-name">EnsureUserIsAdmin</span>
 {
     <span class="token-keyword">public function</span> <span class="token-function">handle</span>(Request <span class="token-variable">$request</span>, Closure <span class="token-variable">$next</span>)
     {
@@ -234,14 +277,14 @@ php artisan make:middleware VendorMiddleware</code></pre>
                 <span class="code-lang">php</span>
                 <pre class="code-block"><code><span class="token-comment">// bootstrap/app.php</span>
 
-<span class="token-keyword">use</span> <span class="token-class-name">App\Http\Middleware\AdminMiddleware</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">App\Http\Middleware\VendorMiddleware</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">App\Http\Middleware\EnsureUserIsAdmin</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">App\Http\Middleware\EnsureUserIsVendor</span>;
 
 <span class="token-keyword">return</span> Application::<span class="token-function">configure</span>(basePath: <span class="token-function">dirname</span>(__DIR__))
     -><span class="token-function">withMiddleware</span>(<span class="token-keyword">function</span> (Middleware <span class="token-variable">$middleware</span>) {
         <span class="token-variable">$middleware</span>-><span class="token-function">alias</span>([
-            <span class="token-string">'admin'</span> => AdminMiddleware::<span class="token-keyword">class</span>,
-            <span class="token-string">'vendor'</span> => VendorMiddleware::<span class="token-keyword">class</span>,
+            <span class="token-string">'admin'</span> => EnsureUserIsAdmin::<span class="token-keyword">class</span>,
+            <span class="token-string">'vendor'</span> => EnsureUserIsVendor::<span class="token-keyword">class</span>,
         ]);
     })
     -><span class="token-function">create</span>();</code></pre>
@@ -257,6 +300,40 @@ php artisan make:middleware VendorMiddleware</code></pre>
     
     <div class="section-card space-y-6">
         <div>
+            </div>
+        </div>
+
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">Configurer la redirection après login</h4>
+            <p class="text-gray-700 mb-4">
+                Par défaut, Breeze redirige tout le monde vers <code>/dashboard</code>. Pour rediriger selon le rôle, modifiez le contrôleur de session :
+            </p>
+            
+            <div class="code-block-wrapper">
+                <span class="code-lang">php</span>
+                <pre class="code-block"><code><span class="token-comment">// app/Http/Controllers/Auth/AuthenticatedSessionController.php</span>
+
+<span class="token-keyword">public function</span> <span class="token-function">store</span>(LoginRequest <span class="token-variable">$request</span>): RedirectResponse
+{
+    <span class="token-variable">$request</span>-><span class="token-function">authenticate</span>();
+    <span class="token-variable">$request</span>-><span class="token-function">session</span>()-><span class="token-function">regenerate</span>();
+
+    <span class="token-comment">// Redirection basée sur le rôle</span>
+    <span class="token-variable">$role</span> = <span class="token-variable">$request</span>-><span class="token-function">user</span>()->role;
+
+    <span class="token-keyword">if</span> (<span class="token-variable">$role</span> === <span class="token-string">'admin'</span>) {
+        <span class="token-keyword">return</span> <span class="token-function">redirect</span>()-><span class="token-function">route</span>(<span class="token-string">'admin.dashboard'</span>);
+    } <span class="token-keyword">elseif</span> (<span class="token-variable">$role</span> === <span class="token-string">'vendor'</span>) {
+        <span class="token-keyword">return</span> <span class="token-function">redirect</span>()-><span class="token-function">route</span>(<span class="token-string">'vendor.dashboard'</span>);
+    }
+
+    <span class="token-keyword">return</span> <span class="token-function">redirect</span>()-><span class="token-function">intended</span>(<span class="token-function">route</span>(<span class="token-string">'dashboard'</span>, absolute: <span class="token-keyword">false</span>));
+}</code></pre>
+                <button class="copy-btn">Copier</button>
+            </div>
+        </div>
+        
+        <div>
             <h4 class="text-lg font-semibold text-gray-900 mb-2">Définir les routes protégées</h4>
             
             <div class="code-block-wrapper">
@@ -264,17 +341,17 @@ php artisan make:middleware VendorMiddleware</code></pre>
                 <pre class="code-block"><code><span class="token-comment">// routes/web.php</span>
 
 <span class="token-comment">// Routes Admin</span>
-Route::<span class="token-function">prefix</span>(<span class="token-string">'admin'</span>)-><span class="token-function">middleware</span>([<span class="token-string">'auth'</span>, <span class="token-string">'admin'</span>])-><span class="token-function">name</span>(<span class="token-string">'admin.'</span>)-><span class="token-function">group</span>(<span class="token-keyword">function</span> () {
+Route::<span class="token-function">prefix</span>(<span class="token-string">'admin'</span>)-><span class="token-function">middleware</span>([<span class="token-string">'auth'</span>, <span class="token-string">'verified'</span>, <span class="token-string">'admin'</span>])-><span class="token-function">name</span>(<span class="token-string">'admin.'</span>)-><span class="token-function">group</span>(<span class="token-keyword">function</span> () {
     Route::<span class="token-function">get</span>(<span class="token-string">'/dashboard'</span>, <span class="token-keyword">fn</span>() => <span class="token-function">view</span>(<span class="token-string">'admin.dashboard'</span>))-><span class="token-function">name</span>(<span class="token-string">'dashboard'</span>);
 });
 
 <span class="token-comment">// Routes Vendeur</span>
-Route::<span class="token-function">prefix</span>(<span class="token-string">'vendor'</span>)-><span class="token-function">middleware</span>([<span class="token-string">'auth'</span>, <span class="token-string">'vendor'</span>])-><span class="token-function">name</span>(<span class="token-string">'vendor.'</span>)-><span class="token-function">group</span>(<span class="token-keyword">function</span> () {
+Route::<span class="token-function">prefix</span>(<span class="token-string">'vendor'</span>)-><span class="token-function">middleware</span>([<span class="token-string">'auth'</span>, <span class="token-string">'verified'</span>, <span class="token-string">'vendor'</span>])-><span class="token-function">name</span>(<span class="token-string">'vendor.'</span>)-><span class="token-function">group</span>(<span class="token-keyword">function</span> () {
     Route::<span class="token-function">get</span>(<span class="token-string">'/dashboard'</span>, <span class="token-keyword">fn</span>() => <span class="token-function">view</span>(<span class="token-string">'vendor.dashboard'</span>))-><span class="token-function">name</span>(<span class="token-string">'dashboard'</span>);
 });
 
 <span class="token-comment">// Routes Client (authentifié)</span>
-Route::<span class="token-function">middleware</span>(<span class="token-string">'auth'</span>)-><span class="token-function">group</span>(<span class="token-keyword">function</span> () {
+Route::<span class="token-function">middleware</span>([<span class="token-string">'auth'</span>, <span class="token-string">'verified'</span>])-><span class="token-function">group</span>(<span class="token-keyword">function</span> () {
     Route::<span class="token-function">get</span>(<span class="token-string">'/dashboard'</span>, <span class="token-keyword">fn</span>() => <span class="token-function">view</span>(<span class="token-string">'customer.dashboard'</span>))-><span class="token-function">name</span>(<span class="token-string">'dashboard'</span>);
 });</code></pre>
                 <button class="copy-btn">Copier</button>
@@ -320,6 +397,33 @@ Route::<span class="token-function">middleware</span>(<span class="token-string"
                 &lt;/div&gt;
             &lt;/div&gt;
         &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/x-layouts.app&gt;</code></pre>
+                <button class="copy-btn">Copier</button>
+            </div>
+        </div>
+        
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">Créer les vues Dashboard pour Admin et Client</h4>
+            <p class="text-gray-700 mb-4">
+                Sur le même modèle, créez les fichiers pour les autres rôles :
+            </p>
+            
+            <div class="code-block-wrapper">
+                <span class="code-lang">blade</span>
+                <pre class="code-block"><code><span class="token-comment">&lt;!-- resources/views/admin/dashboard.blade.php --&gt;</span>
+&lt;x-layouts.app title="Tableau de bord Admin"&gt;
+    &lt;div class="container py-5"&gt;
+        &lt;h1&gt;Espace Administration&lt;/h1&gt;
+        &lt;p&gt;Bienvenue dans le panneau de contrôle.&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/x-layouts.app&gt;
+
+<span class="token-comment">&lt;!-- resources/views/customer/dashboard.blade.php --&gt;</span>
+&lt;x-layouts.app title="Mon Espace"&gt;
+    &lt;div class="container py-5"&gt;
+        &lt;h1&gt;Mon Compte&lt;/h1&gt;
+        &lt;p&gt;Bienvenue dans votre espace client.&lt;/p&gt;
     &lt;/div&gt;
 &lt;/x-layouts.app&gt;</code></pre>
                 <button class="copy-btn">Copier</button>
