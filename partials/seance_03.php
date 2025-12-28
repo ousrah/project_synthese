@@ -470,9 +470,364 @@ Schema::<span class="token-function">table</span>(<span class="token-string">'pr
     </div>
 </section>
 
-<!-- ========== 3.4 COMMISSION ========== -->
+<!-- ========== 3.4 ROUTES & DASHBOARD ========== -->
+<section id="seance3-routes" class="mb-16">
+    <h3 class="text-2xl font-semibold mb-3">3.4 Routes & Dashboard</h3>
+    
+    <div class="section-card space-y-6">
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">1. Contrôleur Dashboard Vendeur</h4>
+            <p class="text-gray-700 mb-2">
+                Nous avons besoin d'un contrôleur pour gérer la page d'accueil du vendeur.
+            </p>
+            <div class="code-block-wrapper">
+                <span class="code-lang">php</span>
+                <pre class="code-block"><code><span class="token-comment">// app/Http/Controllers/Vendor/DashboardController.php</span>
+
+<span class="token-preprocessor">&lt;?php</span>
+
+<span class="token-keyword">namespace</span> <span class="token-namespace">App\Http\Controllers\Vendor</span>;
+
+<span class="token-keyword">use</span> <span class="token-class-name">App\Http\Controllers\Controller</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Support\Facades\Auth</span>;
+
+<span class="token-keyword">class</span> <span class="token-class-name">DashboardController</span> <span class="token-keyword">extends</span> <span class="token-class-name">Controller</span>
+{
+    <span class="token-keyword">public function</span> <span class="token-function">index</span>()
+    {
+        <span class="token-variable">$user</span> = Auth::<span class="token-function">user</span>();
+        <span class="token-variable">$store</span> = <span class="token-variable">$user</span>->store;
+
+        <span class="token-comment">// Rediriger vers la création si pas encore de boutique</span>
+        <span class="token-keyword">if</span> (!<span class="token-variable">$store</span>) {
+            <span class="token-keyword">return</span> <span class="token-function">redirect</span>()-><span class="token-function">route</span>(<span class="token-string">'vendor.store.create'</span>)
+                -><span class="token-function">with</span>(<span class="token-string">'warning'</span>, <span class="token-string">'Veuillez d\'abord créer votre boutique.'</span>);
+        }
+
+        <span class="token-keyword">return</span> <span class="token-function">view</span>(<span class="token-string">'vendor.dashboard'</span>, <span class="token-function">compact</span>(<span class="token-string">'store'</span>));
+    }
+}</code></pre>
+                <button class="copy-btn">Copier</button>
+            </div>
+        </div>
+
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">2. Configuration des Routes</h4>
+            <p class="text-gray-700 mb-2">
+                Ajoutez les routes suivantes dans <code>routes/web.php</code>.
+            </p>
+            <div class="code-block-wrapper">
+                <span class="code-lang">php</span>
+                <pre class="code-block"><code><span class="token-comment">// routes/web.php</span>
+
+<span class="token-keyword">use</span> <span class="token-class-name">App\Http\Controllers\Vendor\StoreController</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">App\Http\Controllers\Vendor\ProductController</span>;
+<span class="token-keyword">use</span> <span class="token-class-name">App\Http\Controllers\Vendor\DashboardController</span> <span class="token-keyword">as</span> VendorDashboardController;
+
+<span class="token-comment">// ...</span>
+
+Route::<span class="token-function">prefix</span>(<span class="token-string">'vendor'</span>)
+    -><span class="token-function">name</span>(<span class="token-string">'vendor.'</span>)
+    -><span class="token-function">middleware</span>([<span class="token-string">'auth'</span>, <span class="token-string">'verified'</span>, <span class="token-string">'vendor'</span>]) <span class="token-comment">// Middleware vendor créé en S2</span>
+    -><span class="token-function">group</span>(<span class="token-keyword">function</span> () {
+        
+        <span class="token-comment">// Dashboard</span>
+        Route::<span class="token-function">get</span>(<span class="token-string">'/dashboard'</span>, [VendorDashboardController::<span class="token-keyword">class</span>, <span class="token-string">'index'</span>])-><span class="token-function">name</span>(<span class="token-string">'dashboard'</span>);
+
+        <span class="token-comment">// Boutique</span>
+        Route::<span class="token-function">get</span>(<span class="token-string">'/store/create'</span>, [StoreController::<span class="token-keyword">class</span>, <span class="token-string">'create'</span>])-><span class="token-function">name</span>(<span class="token-string">'store.create'</span>);
+        Route::<span class="token-function">post</span>(<span class="token-string">'/store'</span>, [StoreController::<span class="token-keyword">class</span>, <span class="token-string">'store'</span>])-><span class="token-function">name</span>(<span class="token-string">'store.store'</span>);
+        Route::<span class="token-function">get</span>(<span class="token-string">'/store'</span>, [StoreController::<span class="token-keyword">class</span>, <span class="token-string">'edit'</span>])-><span class="token-function">name</span>(<span class="token-string">'store.edit'</span>);
+        Route::<span class="token-function">put</span>(<span class="token-string">'/store'</span>, [StoreController::<span class="token-keyword">class</span>, <span class="token-string">'update'</span>])-><span class="token-function">name</span>(<span class="token-string">'store.update'</span>);
+
+        <span class="token-comment">// Produits</span>
+        Route::<span class="token-function">resource</span>(<span class="token-string">'products'</span>, ProductController::<span class="token-keyword">class</span>);
+});</code></pre>
+                <button class="copy-btn">Copier</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== 3.5 VUES ET INTERFACE VENDEUR ========== -->
+<section id="seance3-views" class="mb-16">
+    <h3 class="text-2xl font-semibold mb-3">3.5 Vues et Interface Vendeur</h3>
+    
+    <div class="section-card space-y-6">
+        <p class="text-gray-700">
+            Maintenant que la logique backend est prête (Modèles, Contrôleurs), nous devons créer les <strong>vues</strong> 
+            pour permettre aux vendeurs d'interagir avec la plateforme.
+        </p>
+
+        <!-- 1. Création de boutique -->
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">3.5.1 Vue : Créer ma boutique</h4>
+            <p class="text-gray-600 mb-2">Fichier : <code>resources/views/vendor/store/create.blade.php</code></p>
+            
+            <div class="code-block-wrapper">
+                <span class="code-lang">html</span>
+                <pre class="code-block"><code>{{-- resources/views/vendor/store/create.blade.php --}}
+&lt;x-layouts.app&gt;
+    &lt;div class="container py-4"&gt;
+        &lt;h1 class="h3 mb-4"&gt;&lt;i class="bi bi-shop me-2"&gt;&lt;/i&gt;Créer ma boutique&lt;/h1&gt;
+        
+        &lt;form method="POST" action="{{ route('vendor.store.store') }}" enctype="multipart/form-data"&gt;
+            @csrf
+            
+            &lt;div class="row"&gt;
+                &lt;div class="col-lg-8"&gt;
+                    {{-- Informations générales --}}
+                    &lt;div class="card border-0 shadow-sm mb-4"&gt;
+                        &lt;div class="card-header bg-white"&gt;
+                            &lt;h5 class="mb-0"&gt;Informations&lt;/h5&gt;
+                        &lt;/div&gt;
+                        &lt;div class="card-body"&gt;
+                            &lt;div class="mb-3"&gt;
+                                &lt;label class="form-label"&gt;Nom de la boutique *&lt;/label&gt;
+                                &lt;input type="text" name="name" class="form-control" required value="{{ old('name') }}"&gt;
+                            &lt;/div&gt;
+                            &lt;div class="mb-3"&gt;
+                                &lt;label class="form-label"&gt;Description&lt;/label&gt;
+                                &lt;textarea name="description" class="form-control" rows="4"&gt;{{ old('description') }}&lt;/textarea&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    
+                    {{-- Images --}}
+                    &lt;div class="card border-0 shadow-sm mb-4"&gt;
+                        &lt;div class="card-header bg-white"&gt;
+                            &lt;h5 class="mb-0"&gt;Images&lt;/h5&gt;
+                        &lt;/div&gt;
+                        &lt;div class="card-body"&gt;
+                            &lt;div class="row"&gt;
+                                &lt;div class="col-md-6"&gt;
+                                    &lt;label class="form-label"&gt;Logo&lt;/label&gt;
+                                    &lt;input type="file" name="logo" class="form-control" accept="image/*"&gt;
+                                &lt;/div&gt;
+                                &lt;div class="col-md-6"&gt;
+                                    &lt;label class="form-label"&gt;Bannière&lt;/label&gt;
+                                    &lt;input type="file" name="banner" class="form-control" accept="image/*"&gt;
+                                &lt;/div&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="col-lg-4"&gt;
+                    {{-- Paiement --}}
+                    &lt;div class="card border-0 shadow-sm mb-4"&gt;
+                        &lt;div class="card-header bg-white"&gt;
+                            &lt;h5 class="mb-0"&gt;Paiement&lt;/h5&gt;
+                        &lt;/div&gt;
+                        &lt;div class="card-body"&gt;
+                            &lt;div class="mb-3"&gt;
+                                &lt;label class="form-label"&gt;Email PayPal&lt;/label&gt;
+                                &lt;input type="email" name="paypal_email" class="form-control" value="{{ old('paypal_email') }}"&gt;
+                            &lt;/div&gt;
+                            &lt;div class="mb-3"&gt;
+                                &lt;label class="form-label"&gt;IBAN&lt;/label&gt;
+                                &lt;input type="text" name="bank_iban" class="form-control" value="{{ old('bank_iban') }}"&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+
+                    &lt;div class="d-grid"&gt;
+                        &lt;button type="submit" class="btn btn-primary btn-lg"&gt;
+                            &lt;i class="bi bi-check-lg me-1"&gt;&lt;/i&gt;Ouvrir ma boutique
+                        &lt;/button&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/form&gt;
+    &lt;/div&gt;
+&lt;/x-layouts.app&gt;</code></pre>
+                <button class="copy-btn">Copier</button>
+            </div>
+        </div>
+
+        <!-- 2. Dashboard Vendeur -->
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">3.5.2 Vue : Dashboard Vendeur</h4>
+            <p class="text-gray-600 mb-2">Fichier : <code>resources/views/vendor/dashboard.blade.php</code></p>
+            <p class="text-sm text-gray-500 mb-4">Mettez à jour le fichier créé en Séance 2 avec ce contenu complet.</p>
+            
+            <div class="code-block-wrapper">
+                <span class="code-lang">html</span>
+                <pre class="code-block"><code>{{-- resources/views/vendor/dashboard.blade.php --}}
+&lt;x-layouts.app&gt;
+    &lt;div class="container-fluid py-4"&gt;
+        &lt;div class="d-flex justify-content-between align-items-center mb-4"&gt;
+            &lt;div&gt;
+                &lt;h1 class="h3"&gt;&lt;i class="bi bi-shop me-2"&gt;&lt;/i&gt;{{ $store->getTranslation('name', app()->getLocale()) }}&lt;/h1&gt;
+                &lt;small class="text-muted"&gt;Dashboard vendeur&lt;/small&gt;
+            &lt;/div&gt;
+            &lt;div&gt;
+                &lt;a href="{{ route('vendor.products.create') }}" class="btn btn-primary"&gt;
+                    &lt;i class="bi bi-plus-lg me-1"&gt;&lt;/i&gt;Nouveau Produit
+                &lt;/a&gt;
+                &lt;a href="{{ route('vendor.store.edit') }}" class="btn btn-outline-secondary"&gt;
+                    &lt;i class="bi bi-gear"&gt;&lt;/i&gt; Configurer
+                &lt;/a&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        
+        {{-- Cartes Statistiques Simples --}}
+        &lt;div class="row g-4 mb-4"&gt;
+            &lt;div class="col-md-3"&gt;
+                &lt;div class="card border-0 shadow-sm h-100"&gt;
+                    &lt;div class="card-body text-center"&gt;
+                        &lt;h4 class="mb-0"&gt;{{ $store->products_count }}&lt;/h4&gt;
+                        &lt;small class="text-muted"&gt;Produits&lt;/small&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class="col-md-3"&gt;
+                &lt;div class="card border-0 shadow-sm h-100"&gt;
+                    &lt;div class="card-body text-center"&gt;
+                        &lt;h4 class="mb-0"&gt;{{ $store->orders_count }}&lt;/h4&gt;
+                        &lt;small class="text-muted"&gt;Ventes&lt;/small&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class="col-md-3"&gt;
+                &lt;div class="card border-0 shadow-sm h-100"&gt;
+                    &lt;div class="card-body text-center"&gt;
+                        &lt;h4 class="mb-0"&gt;{{ number_format($store->total_sales, 2) }} €&lt;/h4&gt;
+                        &lt;small class="text-muted"&gt;Chiffre d'affaires&lt;/small&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/x-layouts.app&gt;</code></pre>
+                <button class="copy-btn">Copier</button>
+            </div>
+        </div>
+
+        <!-- 3. Liste Produits -->
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">3.5.3 Vue : Liste des produits</h4>
+            <p class="text-gray-600 mb-2">Fichier : <code>resources/views/vendor/products/index.blade.php</code></p>
+            
+            <div class="code-block-wrapper">
+                <span class="code-lang">html</span>
+                <pre class="code-block"><code>{{-- resources/views/vendor/products/index.blade.php --}}
+&lt;x-layouts.app&gt;
+    &lt;div class="container py-4"&gt;
+        &lt;div class="d-flex justify-content-between align-items-center mb-4"&gt;
+            &lt;h1 class="h3"&gt;Mes produits&lt;/h1&gt;
+            &lt;a href="{{ route('vendor.products.create') }}" class="btn btn-primary"&gt;Ajouter&lt;/a&gt;
+        &lt;/div&gt;
+        
+        &lt;div class="card border-0 shadow-sm"&gt;
+            &lt;table class="table table-hover mb-0"&gt;
+                &lt;thead class="table-light"&gt;
+                    &lt;tr&gt;
+                        &lt;th&gt;Produit&lt;/th&gt;
+                        &lt;th&gt;Prix&lt;/th&gt;
+                        &lt;th&gt;Statut&lt;/th&gt;
+                        &lt;th&gt;Actions&lt;/th&gt;
+                    &lt;/tr&gt;
+                &lt;/thead&gt;
+                &lt;tbody&gt;
+                    @forelse($products as $product)
+                    &lt;tr&gt;
+                        &lt;td&gt;
+                            &lt;strong&gt;{{ $product->getTranslation('name', 'fr') }}&lt;/strong&gt;
+                            &lt;br&gt;&lt;small class="text-muted"&gt;{{ $product->views_count }} vues&lt;/small&gt;
+                        &lt;/td&gt;
+                        &lt;td&gt;{{ number_format($product->price, 2) }} €&lt;/td&gt;
+                        &lt;td&gt;
+                            @if($product->is_active) &lt;span class="badge bg-success"&gt;Actif&lt;/span&gt;
+                            @else &lt;span class="badge bg-secondary"&gt;Inactif&lt;/span&gt; @endif
+                        &lt;/td&gt;
+                        &lt;td&gt;
+                            &lt;a href="{{ route('vendor.products.edit', $product) }}" class="btn btn-sm btn-outline-primary"&gt;Modifier&lt;/a&gt;
+                        &lt;/td&gt;
+                    &lt;/tr&gt;
+                    @empty
+                    &lt;tr&gt;&lt;td colspan="4" class="text-center py-4"&gt;Aucun produit&lt;/td&gt;&lt;/tr&gt;
+                    @endforelse
+                &lt;/tbody&gt;
+            &lt;/table&gt;
+            &lt;div class="card-footer bg-white"&gt;{{ $products->links() }}&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/x-layouts.app&gt;</code></pre>
+                <button class="copy-btn">Copier</button>
+            </div>
+        </div>
+
+        <!-- 4. Créer Produit -->
+        <div>
+            <h4 class="text-lg font-semibold text-gray-900 mb-2">3.5.4 Vue : Ajouter un produit</h4>
+            <p class="text-gray-600 mb-2">Fichier : <code>resources/views/vendor/products/create.blade.php</code></p>
+            
+            <div class="code-block-wrapper">
+                <span class="code-lang">html</span>
+                <pre class="code-block"><code>{{-- resources/views/vendor/products/create.blade.php --}}
+&lt;x-layouts.app&gt;
+    &lt;div class="container py-4"&gt;
+        &lt;h1 class="h3 mb-4"&gt;Nouveau produit&lt;/h1&gt;
+        
+        &lt;form method="POST" action="{{ route('vendor.products.store') }}" enctype="multipart/form-data"&gt;
+            @csrf
+            &lt;div class="row"&gt;
+                &lt;div class="col-lg-8"&gt;
+                    &lt;div class="card border-0 shadow-sm p-3 mb-4"&gt;
+                        &lt;div class="mb-3"&gt;
+                            &lt;label class="form-label"&gt;Nom *&lt;/label&gt;
+                            &lt;input type="text" name="name" class="form-control" required&gt;
+                        &lt;/div&gt;
+                        &lt;div class="mb-3"&gt;
+                            &lt;label class="form-label"&gt;Description *&lt;/label&gt;
+                            &lt;textarea name="description" class="form-control" rows="5" required&gt;&lt;/textarea&gt;
+                        &lt;/div&gt;
+                        &lt;div class="row"&gt;
+                            &lt;div class="col-md-6 mb-3"&gt;
+                                &lt;label class="form-label"&gt;Prix (€) *&lt;/label&gt;
+                                &lt;input type="number" name="price" class="form-control" step="0.01" required&gt;
+                            &lt;/div&gt;
+                            &lt;div class="col-md-6 mb-3"&gt;
+                                &lt;label class="form-label"&gt;Type&lt;/label&gt;
+                                &lt;select name="type" class="form-select"&gt;
+                                    &lt;option value="digital"&gt;Numérique&lt;/option&gt;
+                                    &lt;option value="course"&gt;Cours&lt;/option&gt;
+                                &lt;/select&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+                
+                &lt;div class="col-lg-4"&gt;
+                    &lt;div class="card border-0 shadow-sm p-3"&gt;
+                        &lt;label class="form-label"&gt;Image&lt;/label&gt;
+                        &lt;input type="file" name="thumbnail" class="form-control mb-3"&gt;
+                        
+                        &lt;label class="form-label"&gt;Catégorie&lt;/label&gt;
+                        &lt;select name="category_id" class="form-select mb-3"&gt;
+                            &lt;option value=""&gt;Choisir...&lt;/option&gt;
+                            @foreach($categories as $cat)
+                            &lt;option value="{{ $cat->id }}"&gt;{{ $cat-&gt;getTranslation('name', 'fr') }}&lt;/option&gt;
+                            @endforeach
+                        &lt;/select&gt;
+                        
+                        &lt;button type="submit" class="btn btn-primary w-100"&gt;Enregistrer&lt;/button&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/form&gt;
+    &lt;/div&gt;
+&lt;/x-layouts.app&gt;</code></pre>
+                <button class="copy-btn">Copier</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== 3.6 COMMISSION ========== -->
 <section id="seance3-commission" class="mb-16">
-    <h3 class="text-2xl font-semibold mb-3">3.4 Système de Commission</h3>
+    <h3 class="text-2xl font-semibold mb-3">3.6 Système de Commission</h3>
     
     <div class="section-card">
         <div class="alert-info">
