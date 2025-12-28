@@ -89,7 +89,7 @@
         <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'address'</span>)-><span class="token-function">nullable</span>();
         <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'city'</span>)-><span class="token-function">nullable</span>();
         <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'postal_code'</span>)-><span class="token-function">nullable</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'country'</span>, <span class="token-number">2</span>)-><span class="token-function">nullable</span>(); <span class="token-comment">// Code ISO 2</span>
+        <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'country'</span>)-><span class="token-function">nullable</span>(); <span class="token-comment">// Nom complet du pays</span>
         <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'phone'</span>)-><span class="token-function">nullable</span>();
         
         <span class="token-comment">// SEO</span>
@@ -108,12 +108,12 @@
         
         <span class="token-variable">$table</span>-><span class="token-function">index</span>(<span class="token-string">'is_active'</span>);
     });
-}
-
-<span class="token-comment">// Ajouter store_id à products (contrainte Foreign Key)</span>
-Schema::<span class="token-function">table</span>(<span class="token-string">'products'</span>, <span class="token-keyword">function</span> (Blueprint <span class="token-variable">$table</span>) {
-    <span class="token-variable">$table</span>-><span class="token-function">foreign</span>(<span class="token-string">'store_id'</span>)-><span class="token-function">references</span>(<span class="token-string">'id'</span>)-><span class="token-function">on</span>(<span class="token-string">'stores'</span>)-><span class="token-function">cascadeOnDelete</span>();
-});</code></pre>
+    
+    <span class="token-comment">// Ajouter la contrainte FK store_id sur products (la colonne existe déjà depuis Séance 1)</span>
+    Schema::<span class="token-function">table</span>(<span class="token-string">'products'</span>, <span class="token-keyword">function</span> (Blueprint <span class="token-variable">$table</span>) {
+        <span class="token-variable">$table</span>-><span class="token-function">foreign</span>(<span class="token-string">'store_id'</span>)-><span class="token-function">references</span>(<span class="token-string">'id'</span>)-><span class="token-function">on</span>(<span class="token-string">'stores'</span>)-><span class="token-function">cascadeOnDelete</span>();
+    });
+}</code></pre>
     <button class="copy-btn">Copier</button>
 </div>
 
@@ -358,8 +358,42 @@ Schema::<span class="token-function">table</span>(<span class="token-string">'pr
         <span class="token-keyword">return</span> <span class="token-function">redirect</span>()-><span class="token-function">route</span>(<span class="token-string">'vendor.dashboard'</span>)
             -><span class="token-function">with</span>(<span class="token-string">'success'</span>, <span class="token-string">'Boutique créée avec succès !'</span>);
     }
-    
-    <span class="token-comment">// ... Méthodes edit() et update() à implémenter de manière similaire</span>
+
+    <span class="token-keyword">public function</span> <span class="token-function">edit</span>()
+    {
+        <span class="token-variable">$store</span> = Auth::<span class="token-function">user</span>()->store;
+        <span class="token-keyword">if</span> (!<span class="token-variable">$store</span>) {
+            <span class="token-keyword">return</span> <span class="token-function">redirect</span>()-><span class="token-function">route</span>(<span class="token-string">'vendor.store.create'</span>);
+        }
+        <span class="token-keyword">return</span> <span class="token-function">view</span>(<span class="token-string">'vendor.store.edit'</span>, <span class="token-function">compact</span>(<span class="token-string">'store'</span>));
+    }
+
+    <span class="token-keyword">public function</span> <span class="token-function">update</span>(Request <span class="token-variable">$request</span>)
+    {
+        <span class="token-variable">$store</span> = Auth::<span class="token-function">user</span>()->store;
+        
+        <span class="token-variable">$validated</span> = <span class="token-variable">$request</span>-><span class="token-function">validate</span>([
+            <span class="token-string">'name'</span> => <span class="token-string">'required|string|max:255'</span>,
+            <span class="token-string">'description'</span> => <span class="token-string">'nullable|string'</span>,
+            <span class="token-string">'short_description'</span> => <span class="token-string">'nullable|string|max:300'</span>,
+            <span class="token-comment">// ... autres champs identiques à store()</span>
+        ]);
+
+        <span class="token-variable">$store</span>-><span class="token-function">update</span>([
+            <span class="token-string">'name'</span> => [<span class="token-string">'fr'</span> => <span class="token-variable">$validated</span>[<span class="token-string">'name'</span>]],
+            <span class="token-string">'description'</span> => [<span class="token-string">'fr'</span> => <span class="token-variable">$validated</span>[<span class="token-string">'description'</span>] ?? <span class="token-keyword">null</span>],
+            <span class="token-string">'short_description'</span> => [<span class="token-string">'fr'</span> => <span class="token-variable">$validated</span>[<span class="token-string">'short_description'</span>] ?? <span class="token-keyword">null</span>],
+            <span class="token-comment">// ... autres champs</span>
+        ]);
+
+        <span class="token-comment">// Màj Logo</span>
+        <span class="token-keyword">if</span> (<span class="token-variable">$request</span>-><span class="token-function">hasFile</span>(<span class="token-string">'logo'</span>)) {
+            <span class="token-variable">$store</span>-><span class="token-function">clearMediaCollection</span>(<span class="token-string">'logo'</span>);
+            <span class="token-variable">$store</span>-><span class="token-function">addMediaFromRequest</span>(<span class="token-string">'logo'</span>)-><span class="token-function">toMediaCollection</span>(<span class="token-string">'logo'</span>);
+        }
+
+        <span class="token-keyword">return</span> <span class="token-function">back</span>()-><span class="token-function">with</span>(<span class="token-string">'success'</span>, <span class="token-string">'Boutique mise à jour !'</span>);
+    }
 }</code></pre>
                 <button class="copy-btn">Copier</button>
             </div>
