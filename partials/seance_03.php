@@ -343,9 +343,8 @@
             <span class="token-string">'is_active'</span> => <span class="token-keyword">true</span>,
         ]);
 
-        <span class="token-comment">// Marquer l'utilisateur comme vendeur et lui donner le rôle</span>
-        <span class="token-variable">$user</span>-><span class="token-function">update</span>([<span class="token-string">'is_vendor'</span> => <span class="token-keyword">true</span>]);
-        <span class="token-variable">$user</span>-><span class="token-function">assignRole</span>(<span class="token-string">'vendor'</span>);
+        <span class="token-comment">// Marquer l'utilisateur comme vendeur</span>
+        <span class="token-variable">$user</span>-><span class="token-function">update</span>([<span class="token-string">'role'</span> => <span class="token-string">'vendor'</span>]);
 
         <span class="token-comment">// Gestion des médias (Logo/Bannière)</span>
         <span class="token-keyword">if</span> (<span class="token-variable">$request</span>-><span class="token-function">hasFile</span>(<span class="token-string">'logo'</span>)) {
