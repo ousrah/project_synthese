@@ -54,7 +54,7 @@ cd boutique</div>
             <div class="code-lang">TERMINAL</div>
             <button class="copy-btn">Copier</button>
             <div class="code-block">composer require spatie/laravel-medialibrary
-php artisan vendor:publish --provider="Spatie\MediaLibrary\MediaLibraryServiceProvider" --tag="migrations"
+php artisan vendor:publish --provider="Spatie\MediaLibrary\MediaLibraryServiceProvider"
 php artisan migrate
 
 composer require spatie/laravel-activitylog
