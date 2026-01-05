@@ -117,7 +117,7 @@ body {
         <div class="code-block-wrapper">
             <div class="code-lang">PHP</div>
             <button class="copy-btn">Copier</button>
-            <div class="code-block"><pre><?= htmlspecialchars("<? php
+            <div class="code-block"><?= htmlspecialchars("<?php
 
 use Illuminate\Support\Facades\Route;
 use App\Models\Product;
@@ -184,7 +184,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';") ?></pre></div>
+require __DIR__.'/auth.php';") ?></div>
         </div>
     </div>
 </section>
