@@ -2,10 +2,6 @@
  * ===================================================================
  * SCRIPTS INTERACTIFS DU COURS
  * ===================================================================
- * 
- * - Bouton Copier pour les blocs de code
- * - Toggle pour afficher/masquer les solutions
- * - Navigation flottante
  */
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -33,23 +29,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     this.innerText = 'Copier';
                 }, 2000);
             });
-        });
-    });
-
-    // === TOGGLE SOLUTION ===
-    document.querySelectorAll('.solution-toggle').forEach(button => {
-        button.addEventListener('click', function () {
-            const solutionContent = this.nextElementSibling;
-
-            if (solutionContent.style.display === 'block') {
-                solutionContent.style.display = 'none';
-                this.innerText = '👁️ Voir la solution';
-                this.style.backgroundColor = '#3b82f6';
-            } else {
-                solutionContent.style.display = 'block';
-                this.innerText = '🙈 Masquer la solution';
-                this.style.backgroundColor = '#6b7280';
-            }
         });
     });
 
@@ -100,32 +79,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (link.getAttribute('href') === '#' + current) {
                     link.classList.add('active');
                 }
+                // Also handle classes for floating aside menu
+                if (link.parentElement.classList.contains('hover:text-blue-600')) {
+                    // This is for the top grid links
+                }
+            });
+
+            // Special color for floating menu active links
+            document.querySelectorAll('.chapter-nav .toc-link').forEach(link => {
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('bg-blue-100', 'text-blue-700', 'font-bold');
+                } else {
+                    link.classList.remove('bg-blue-100', 'text-blue-700', 'font-bold');
+                }
             });
         });
     }
 });
-
-// === FONCTION UTILITAIRE POUR IMPRIMER UNE SECTION ===
-function printSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    if (!section) return;
-
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Impression - ${document.title}</title>
-            <link href="style.css" rel="stylesheet">
-            <style>
-                body { padding: 2rem; }
-                .copy-btn, .solution-toggle, .chapter-nav { display: none !important; }
-                .solution-content { display: block !important; }
-            </style>
-        </head>
-        <body>${section.innerHTML}</body>
-        </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
-}

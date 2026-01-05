@@ -70,7 +70,7 @@
         <h2 class="text-xl font-bold mb-3">🎯 Objectif du Projet</h2>
         <p class="text-blue-100 leading-relaxed">
             Ce tutoriel vous guide pas à pas dans la création d'une <strong class="text-white">marketplace de produits numériques multi-vendeurs</strong> 
-            complète avec Laravel 12. Vous apprendrez à implémenter : l'authentification avec rôles, le système de boutiques vendeurs, 
+            complète avec Laravel 12. Vous apprendrez à implémenter les fonctionnalités exactes de notre application : l'authentification avec rôles, le système de boutiques vendeurs, 
             le panier d'achat, les paiements Stripe et PayPal, la gestion des médias, et bien plus encore.
         </p>
     </div>
@@ -95,7 +95,7 @@
         </div>
     </div>
 
-    <!-- SOMMAIRE DYNAMIQUE -->
+    <!-- SOMMAIRE DYNAMIQUE (Grid) -->
     <div class="bg-white rounded-lg shadow-sm border p-6 mb-12">
         <h3 class="text-xl font-bold text-gray-800 mb-4">📖 Plan du Cours</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-gray-700">
@@ -117,7 +117,7 @@
                 
                 <div class="border-l-4 border-blue-500 pl-4">
                     <h4 class="font-semibold text-gray-900 flex items-center">
-                        <span class="badge-seance badge-seance-<?= ($seance_num % 5) + 1 ?> mr-2">S<?= $seance_num ?></span>
+                        <span class="badge-seance badge-seance-<?= ($seance_num - 1) % 5 + 1 ?> mr-2">S<?= $seance_num ?></span>
                         <?= htmlspecialchars(preg_replace('/^Séance \d+ : /', '', $part_title)) ?>
                     </h4>
                     <ul class="list-none ml-0 text-sm text-gray-600 space-y-1 mt-2">
@@ -134,7 +134,7 @@
             
             <!-- Conclusion -->
             <div class="border-l-4 border-green-500 pl-4 mt-4">
-                <a href="#conclusion">
+                <a href="#conclusion" class="hover:text-green-600 hover:underline">
                     <h4 class="font-semibold text-gray-900">🎉 Conclusion & Ressources</h4>
                 </a>
             </div>
@@ -143,4 +143,4 @@
         </div>
     </div>
 
-    <!-- Début du contenu principal -->
+

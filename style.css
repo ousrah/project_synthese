@@ -68,186 +68,55 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Bouton Voir/Masquer la solution */
-.solution-toggle {
-    display: inline-block;
-    background-color: #3b82f6;
-    color: white;
-    padding: 0.6rem 1.2rem;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    font-weight: 600;
-    margin-top: 1rem;
-    transition: all 0.2s ease;
-    border: none;
-}
-
-.solution-toggle:hover {
-    background-color: #2563eb;
-    transform: translateY(-1px);
-}
-
-.solution-content {
-    display: none;
-    margin-top: 1rem;
-    border-left: 4px solid #3b82f6;
-    padding-left: 1.5rem;
-    padding-top: 0.5rem;
-}
-
-/* === COLORATION SYNTAXIQUE PHP === */
+/* === COLORS FOR SYNTAX HIGHLIGHTING (Basic) === */
 .token-keyword {
     color: #c678dd;
-    font-weight: 500;
 }
 
-/* class, function, use, return, if, else... */
 .token-string {
     color: #98c379;
 }
 
-/* 'chaîne', "chaîne" */
 .token-variable {
     color: #e06c75;
 }
 
-/* $variable */
 .token-function {
     color: #61afef;
 }
 
-/* nomFonction() */
 .token-comment {
     color: #5c6370;
     font-style: italic;
 }
 
-/* // commentaire, /* commentaire */
 .token-class-name {
     color: #e5c07b;
 }
 
-/* NomDeClasse */
 .token-number {
     color: #d19a66;
 }
 
-/* 123, 10.5 */
 .token-operator {
     color: #56b6c2;
 }
 
-/* =, =>, ->, :: */
 .token-punctuation {
     color: #abb2bf;
 }
 
-/* , ; {} [] () */
-.token-namespace {
-    color: #e5c07b;
-}
-
-/* App\Http\Controllers */
-.token-preprocessor {
-    color: #c678dd;
-}
-
-/* <?php, ?> */
-.token-attribute {
-    color: #d19a66;
-}
-
-/* Attributs PHP 8 */
-
-/* === COLORATION SYNTAXIQUE HTML/BLADE === */
 .token-tag {
     color: #e06c75;
 }
 
-/* <div>, </div> */
 .token-attr-name {
     color: #d19a66;
 }
 
-/* class=, id= */
 .token-attr-value {
     color: #98c379;
 }
-
-/* "valeur" */
-.token-blade {
-    color: #c678dd;
-    font-weight: 500;
-}
-
-/* @if, @foreach, {{ }} */
-.token-blade-var {
-    color: #61afef;
-}
-
-/* $product dans Blade */
-
-/* === COLORATION SYNTAXIQUE BASH === */
-.token-bash-cmd {
-    color: #61afef;
-}
-
-/* php, npm, composer */
-.token-bash-flag {
-    color: #98c379;
-}
-
-/* --option, -v */
-.token-bash-path {
-    color: #e5c07b;
-}
-
-/* chemins de fichiers */
-
-/* === COLORATION SYNTAXIQUE SQL === */
-.token-sql-keyword {
-    color: #c678dd;
-    font-weight: 500;
-}
-
-/* CREATE, SELECT, INSERT */
-.token-sql-type {
-    color: #56b6c2;
-}
-
-/* INT, VARCHAR, TEXT */
-.token-sql-table {
-    color: #e5c07b;
-}
-
-/* nom de table */
-
-/* === COLORATION SYNTAXIQUE JAVASCRIPT === */
-.token-js-keyword {
-    color: #c678dd;
-}
-
-/* const, let, function, async */
-.token-js-string {
-    color: #98c379;
-}
-
-/* 'string', `template` */
-.token-js-function {
-    color: #61afef;
-}
-
-/* nomFonction */
-.token-js-this {
-    color: #e06c75;
-}
-
-/* this */
-.token-js-number {
-    color: #d19a66;
-}
-
-/* 123 */
 
 /* === SECTIONS ET NAVIGATION === */
 .section-card {
@@ -277,43 +146,6 @@ body {
     .chapter-nav {
         display: block;
     }
-}
-
-/* Alertes et notes */
-.alert-info {
-    background-color: #e0f2fe;
-    border-left: 4px solid #0284c7;
-    color: #0c4a6e;
-    padding: 1rem 1.25rem;
-    border-radius: 0 0.5rem 0.5rem 0;
-    margin: 1rem 0;
-}
-
-.alert-warning {
-    background-color: #fef3c7;
-    border-left: 4px solid #f59e0b;
-    color: #78350f;
-    padding: 1rem 1.25rem;
-    border-radius: 0 0.5rem 0.5rem 0;
-    margin: 1rem 0;
-}
-
-.alert-success {
-    background-color: #dcfce7;
-    border-left: 4px solid #22c55e;
-    color: #14532d;
-    padding: 1rem 1.25rem;
-    border-radius: 0 0.5rem 0.5rem 0;
-    margin: 1rem 0;
-}
-
-.alert-danger {
-    background-color: #fee2e2;
-    border-left: 4px solid #ef4444;
-    color: #7f1d1d;
-    padding: 1rem 1.25rem;
-    border-radius: 0 0.5rem 0.5rem 0;
-    margin: 1rem 0;
 }
 
 /* Checklist */

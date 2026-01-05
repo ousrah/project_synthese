@@ -1,1322 +1,902 @@
-<!-- =================================================================== -->
-<!-- SÉANCE 1 : FONDATIONS & CATALOGUE -->
-<!-- =================================================================== -->
-<h2 class="text-3xl font-bold text-gray-800 border-b-4 border-blue-500 pb-2 mb-6 mt-16">
-    <span class="badge-seance badge-seance-1 mr-3">Séance 1</span>
-    Fondations & Catalogue
-</h2>
+<?php
+/**
+ * SÉANCE 1 : Fondations & Catalogue Visiteur
+ * 
+ * Contenu technique : Code source exact du projet (Fidélité 100%).
+ * Design : Modifié pour être professionnel (Bootstrap 5 via Vite + CSS Custom).
+ */
+?>
 
-<!-- ========== 1.1 INTRODUCTION AU PROJET ========== -->
-<section id="seance1-intro" class="mb-16">
-    <h3 class="text-2xl font-semibold mb-3">1.1 Introduction au Projet & Objectifs</h3>
-    <p class="text-xl text-gray-600 mb-8 leading-relaxed">
-        Bienvenue dans ce projet de synthèse ! Nous allons construire une <strong>marketplace de produits numériques</strong> 
-        complète, permettant à plusieurs vendeurs de proposer leurs produits (ebooks, logiciels, templates, cours) 
-        et aux clients de les acheter via Stripe ou PayPal.
-    </p>
-    
+<!-- ===================================================================
+     SÉANCE 1 : FONDATIONS & PREMIERS PAS
+     =================================================================== -->
+
+<!-- 1.1 Introduction -->
+<section id="seance1-intro" class="mb-16 scroll-mt-20">
+    <div class="flex items-center mb-6">
+        <span class="badge-seance badge-seance-1 mr-3">Séance 1</span>
+        <h2 class="text-2xl font-bold text-gray-800">1.1 Introduction et Configuration</h2>
+    </div>
+
     <div class="section-card">
-        <h4 class="text-lg font-semibold text-gray-900 mb-4">🎯 Objectifs de cette séance</h4>
-        <ul class="checklist">
-            <li>Comprendre le cahier des charges et l'architecture du projet</li>
-            <li>Installer et configurer un nouveau projet Laravel 12</li>
-            <li>Créer les modèles Product et Category avec leurs migrations</li>
-            <li>Créer les seeders avec des données de démonstration</li>
-            <li>Créer un layout public avec Bootstrap 5</li>
-            <li>Afficher le catalogue de produits</li>
-        </ul>
-        
-        <div class="alert-info mt-6">
-            <strong>💡 Prérequis :</strong> PHP 8.2+, Composer, Node.js 18+, MySQL/MariaDB, un éditeur de code (VS Code recommandé).
-        </div>
-    </div>
-    
-    <div class="text-right mt-8">
-        <a href="#page-top" class="text-sm font-semibold text-blue-600 hover:underline">↑ Retour en haut</a>
-    </div>
-</section>
-
-<!-- ========== CAHIER DES CHARGES ========== -->
-<section id="seance1-cahier-charges" class="mb-16">
-    <h3 class="text-2xl font-semibold mb-3">1.1.1 Cahier des Charges</h3>
-    
-    <div class="section-card space-y-6">
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">📋 Description du Projet</h4>
-            <p class="text-gray-700 mb-4">
-                <strong>DigiMarket</strong> est une marketplace multi-vendeurs permettant la vente de produits numériques.
-                Les vendeurs peuvent créer leur boutique, gérer leurs produits et recevoir des paiements. 
-                Les clients peuvent parcourir le catalogue, acheter et télécharger leurs achats.
-            </p>
-        </div>
-        
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">👥 Acteurs du Système</h4>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-blue-50 p-4 rounded-lg">
-                    <h5 class="font-bold text-blue-800"><i class="bi bi-person"></i> Client</h5>
-                    <ul class="text-sm text-gray-700 mt-2 list-disc ml-4">
-                        <li>Parcourir les produits</li>
-                        <li>Ajouter au panier</li>
-                        <li>Payer (Stripe/PayPal)</li>
-                        <li>Télécharger les achats</li>
-                        <li>Laisser des avis</li>
-                    </ul>
-                </div>
-                <div class="bg-green-50 p-4 rounded-lg">
-                    <h5 class="font-bold text-green-800"><i class="bi bi-shop"></i> Vendeur</h5>
-                    <ul class="text-sm text-gray-700 mt-2 list-disc ml-4">
-                        <li>Créer sa boutique</li>
-                        <li>Gérer ses produits</li>
-                        <li>Voir ses ventes</li>
-                        <li>Recevoir des paiements</li>
-                        <li>Répondre aux avis</li>
-                    </ul>
-                </div>
-                <div class="bg-red-50 p-4 rounded-lg">
-                    <h5 class="font-bold text-red-800"><i class="bi bi-shield-check"></i> Admin</h5>
-                    <ul class="text-sm text-gray-700 mt-2 list-disc ml-4">
-                        <li>Gérer les utilisateurs</li>
-                        <li>Modérer les produits</li>
-                        <li>Vérifier les boutiques</li>
-                        <li>Configurer la plateforme</li>
-                        <li>Voir les statistiques</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">📦 Types de Produits</h4>
-            <table class="w-full text-sm border-collapse">
-                <thead>
-                    <tr class="bg-gray-100">
-                        <th class="border p-2 text-left">Type</th>
-                        <th class="border p-2 text-left">Description</th>
-                        <th class="border p-2 text-left">Exemple</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td class="border p-2"><code>digital</code></td><td class="border p-2">Fichier téléchargeable</td><td class="border p-2">E-book PDF, Template</td></tr>
-                    <tr><td class="border p-2"><code>subscription</code></td><td class="border p-2">Accès récurrent</td><td class="border p-2">SaaS mensuel</td></tr>
-                    <tr><td class="border p-2"><code>course</code></td><td class="border p-2">Formation en ligne</td><td class="border p-2">Cours vidéo Laravel</td></tr>
-                    <tr><td class="border p-2"><code>license</code></td><td class="border p-2">Clé d'activation</td><td class="border p-2">Logiciel avec licence</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</section>
-
-<!-- ========== SCHÉMA RELATIONNEL ========== -->
-<section id="seance1-schema" class="mb-16">
-    <h3 class="text-2xl font-semibold mb-3">1.1.2 Schéma Relationnel (ERD)</h3>
-    
-    <div class="section-card">
-        <p class="text-gray-700 mb-4">
-            Voici le schéma entité-relation simplifié de notre application. Les tables principales 
-            sont liées par des clés étrangères pour assurer l'intégrité des données.
+        <p class="text-gray-700 leading-relaxed mb-4">
+            Bienvenue ! Nous allons construire une Marketplace complète. 
+            Nous allons suivre à la lettre l'architecture professionnelle de l'application finale.
         </p>
-        
-        <div class="bg-gray-50 p-4 rounded-lg mb-4 overflow-x-auto">
-            <pre class="text-sm text-gray-800"><code>
-┌─────────────┐       ┌─────────────┐       ┌─────────────┐
-│   USERS     │       │   STORES    │       │  PRODUCTS   │
-├─────────────┤       ├─────────────┤       ├─────────────┤
-│ id          │◄──────│ user_id     │       │ id          │
-│ name        │       │ id          │◄──────│ store_id    │
-│ email       │       │ name        │       │ name (JSON) │
-│ role        │       │ slug        │       │ slug        │
-│ ...         │       │ commission  │       │ type        │
-└─────────────┘       │ verified_at │       │ price       │
-                      └─────────────┘       │ ...         │
-                                            └─────────────┘
-                                                   │
-        ┌──────────────────────────────────────────┼───────────────────────┐
-        │                                          │                       │
-        ▼                                          ▼                       ▼
-┌─────────────┐       ┌─────────────┐       ┌─────────────┐       ┌─────────────┐
-│ CATEGORIES  │       │  ORDER_ITEMS │      │   REVIEWS   │       │  DOWNLOADS  │
-├─────────────┤       ├─────────────┤       ├─────────────┤       ├─────────────┤
-│ id          │       │ id          │       │ id          │       │ id          │
-│ parent_id   │       │ order_id    │       │ user_id     │       │ user_id     │
-│ name (JSON) │       │ product_id  │       │ product_id  │       │ order_item  │
-│ slug        │       │ quantity    │       │ rating      │       │ downloaded  │
-└─────────────┘       │ total       │       │ content     │       │ expires_at  │
-      │               └─────────────┘       └─────────────┘       └─────────────┘
-      │                      │
-      │                      │
-      ▼                      ▼
-┌──────────────────┐  ┌─────────────┐
-│ PRODUCT_CATEGORY │  │   ORDERS    │
-├──────────────────┤  ├─────────────┤
-│ product_id       │  │ id          │
-│ category_id      │  │ user_id     │
-└──────────────────┘  │ total       │
-                      │ status      │
-                      │ payment_id  │
-                      └─────────────┘
-            </code></pre>
-        </div>
-        
-        <div class="alert-info">
-            <strong>📖 Relations clés :</strong>
-            <ul class="list-disc ml-6 mt-2 text-sm">
-                <li><code>User 1:1 Store</code> : Un utilisateur vendeur possède une boutique</li>
-                <li><code>Store 1:N Product</code> : Une boutique a plusieurs produits</li>
-                <li><code>Product N:M Category</code> : Un produit peut être dans plusieurs catégories (table pivot)</li>
-                <li><code>Order 1:N OrderItem</code> : Une commande contient plusieurs articles</li>
-                <li><code>OrderItem 1:N Download</code> : Chaque article peut avoir plusieurs téléchargements</li>
+
+        <div class="alert-warning">
+            <h4 class="font-bold mb-1">⚠️ Prérequis</h4>
+            <ul class="list-disc ml-5 mt-2">
+                <li><strong>PHP 8.2+</strong>, <strong>Composer</strong>, <strong>Node.js & NPM</strong>, <strong>MySQL</strong>.</li>
             </ul>
         </div>
     </div>
 </section>
 
-<!-- ========== SPRINTS DE DÉVELOPPEMENT ========== -->
-<section id="seance1-sprints" class="mb-16">
-    <h3 class="text-2xl font-semibold mb-3">1.1.3 Planning de Développement (Sprints)</h3>
-    
+<!-- 1.2 Installation du Projet -->
+<section id="seance1-install" class="mb-16 scroll-mt-20">
+    <div class="flex items-center mb-6">
+        <span class="badge-seance badge-seance-1 mr-3">Séance 1</span>
+        <h2 class="text-2xl font-bold text-gray-800">1.2 Installation et Packages</h2>
+    </div>
+
     <div class="section-card">
-        <p class="text-gray-700 mb-4">
-            Le développement est organisé en <strong>10 séances</strong> (sprints) de 3-4 heures chacune.
-            Chaque sprint aboutit à une fonctionnalité utilisable.
-        </p>
-        
-        <div class="space-y-3">
-            <div class="flex items-center p-3 bg-blue-100 rounded-lg">
-                <span class="badge-seance badge-seance-1 mr-3">S1</span>
-                <div class="flex-1">
-                    <strong>Fondations & Catalogue</strong>
-                    <p class="text-sm text-gray-600">Installation, modèles Category/Product, layout Bootstrap, affichage catalogue</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center p-3 bg-blue-100 rounded-lg">
-                <span class="badge-seance badge-seance-1 mr-3">S2</span>
-                <div class="flex-1">
-                    <strong>Authentification & Rôles</strong>
-                    <p class="text-sm text-gray-600">Laravel Breeze, Spatie Permission, rôles (admin/vendor/customer), middleware</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center p-3 bg-green-100 rounded-lg">
-                <span class="badge-seance badge-seance-2 mr-3">S3</span>
-                <div class="flex-1">
-                    <strong>Multi-Vendeurs & Boutiques</strong>
-                    <p class="text-sm text-gray-600">Modèle Store, création boutique, page vendeur, vérification admin</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center p-3 bg-green-100 rounded-lg">
-                <span class="badge-seance badge-seance-2 mr-3">S4</span>
-                <div class="flex-1">
-                    <strong>Panier & Commandes</strong>
-                    <p class="text-sm text-gray-600">Panier JavaScript (localStorage), modèles Order/OrderItem, checkout</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center p-3 bg-orange-100 rounded-lg">
-                <span class="badge-seance badge-seance-3 mr-3">S5</span>
-                <div class="flex-1">
-                    <strong>Paiements (Stripe & PayPal)</strong>
-                    <p class="text-sm text-gray-600">Intégration Stripe Checkout, PayPal, webhooks, gestion statut commande</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center p-3 bg-orange-100 rounded-lg">
-                <span class="badge-seance badge-seance-3 mr-3">S6</span>
-                <div class="flex-1">
-                    <strong>Médias & Téléchargements</strong>
-                    <p class="text-sm text-gray-600">Spatie Media Library, upload images, fichiers numériques, téléchargements sécurisés</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center p-3 bg-purple-100 rounded-lg">
-                <span class="badge-seance badge-seance-4 mr-3">S7</span>
-                <div class="flex-1">
-                    <strong>Avis, Wishlist & Recherche</strong>
-                    <p class="text-sm text-gray-600">Système d'avis, wishlist JavaScript, recherche avancée avec filtres</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center p-3 bg-purple-100 rounded-lg">
-                <span class="badge-seance badge-seance-4 mr-3">S8</span>
-                <div class="flex-1">
-                    <strong>Dashboard Vendeur</strong>
-                    <p class="text-sm text-gray-600">Tableau de bord vendeur, statistiques, gestion produits, demandes paiement</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center p-3 bg-red-100 rounded-lg">
-                <span class="badge-seance badge-seance-5 mr-3">S9</span>
-                <div class="flex-1">
-                    <strong>Administration</strong>
-                    <p class="text-sm text-gray-600">Gestion utilisateurs, modération produits/avis, vérification boutiques, paramètres</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center p-3 bg-red-100 rounded-lg">
-                <span class="badge-seance badge-seance-5 mr-3">S10</span>
-                <div class="flex-1">
-                    <strong>Finalisation & Déploiement</strong>
-                    <p class="text-sm text-gray-600">Emails, SEO, tests Pest, optimisation, configuration production, déploiement</p>
-                </div>
-            </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-4">étape 1 : Télécharger Laravel</h3>
+        <div class="code-block-wrapper">
+            <div class="code-lang">TERMINAL</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">composer create-project laravel/laravel boutique
+cd boutique</div>
         </div>
-        
-        <div class="alert-success mt-6">
-            <strong>✅ Stack Technique :</strong> Laravel 12, Bootstrap 5, Spatie (Media Library, Permission, Translatable), 
-            Stripe/PayPal, Pest Tests
+
+        <h3 class="text-xl font-bold text-gray-800 mb-4 mt-8">étape 2 : Installer les dépendances (Traductions & UI)</h3>
+        <div class="code-block-wrapper">
+            <div class="code-lang">TERMINAL</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">composer require spatie/laravel-translatable
+npm install bootstrap @popperjs/core sass bootstrap-icons</div>
         </div>
-    </div>
-    
-    <div class="text-right mt-8">
-        <a href="#page-top" class="text-sm font-semibold text-blue-600 hover:underline">↑ Retour en haut</a>
-    </div>
-</section>
 
-
-<!-- ========== 1.2 INSTALLATION ========== -->
-<section id="seance1-install" class="mb-16">
-    <h3 class="text-2xl font-semibold mb-3">1.2 Installation de Laravel 12 & Configuration</h3>
-    
-    <div class="section-card space-y-6">
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">Étape 1 : Créer le projet Laravel</h4>
-            <p class="text-gray-700 mb-4">Ouvrez votre terminal et exécutez la commande suivante pour créer un nouveau projet :</p>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">bash</span>
-                <pre class="code-block"><code><span class="token-comment"># Créer le projet avec Composer</span>
-composer create-project laravel/laravel boutique
-
-<span class="token-comment"># Accéder au dossier du projet</span>
-cd boutique</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-        </div>
-        
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">Étape 2 : Créer la base de données</h4>
-            <p class="text-gray-700 mb-4">
-                Créez une nouvelle base de données MySQL nommée <code class="bg-gray-100 px-2 py-1 rounded">boutique</code> 
-                avec l'encodage <code class="bg-gray-100 px-2 py-1 rounded">utf8mb4_unicode_ci</code>.
+        <div class="alert-danger mt-4 p-4 border-l-4 border-red-600 bg-red-50">
+            <h4 class="text-red-800 font-bold uppercase mb-2">⚠️ TRÈS IMPORTANT : Installez ces packages !</h4>
+            <p class="text-red-700">
+                1. <strong>spatie/laravel-translatable</strong> : Indispensable pour éviter les erreurs `Unknown column 'name'`.<br>
+                2. <strong>bootstrap</strong> : Pour le design professionnel que nous allons mettre en place via Vite.
             </p>
         </div>
         
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">Étape 3 : Configurer le fichier .env</h4>
-            <p class="text-gray-700 mb-4">Ouvrez le fichier <code>.env</code> à la racine du projet et modifiez les paramètres de base de données :</p>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">env</span>
-                <pre class="code-block"><code>APP_NAME=Boutique
-APP_URL=http://localhost:8000
+        <h3 class="text-xl font-bold text-gray-800 mb-4 mt-8">étape 3 : Configurer Vite pour Bootstrap (Sans SCSS)</h3>
+        <p class="mb-2">Nous allons charger Bootstrap via Vite en conservant <code>app.css</code> standard.</p>
+        
+        <p class="mb-2 mt-4">Dans <code>resources/js/app.js</code>, importez le CSS et le JS de Bootstrap :</p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">JS (resources/js/app.js)</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">import './bootstrap';
+// Importer le CSS de Bootstrap
+import 'bootstrap/dist/css/bootstrap.min.css';
+// Importer les icônes (optionnel, sinon utilisez CDN)
+import 'bootstrap-icons/font/bootstrap-icons.css';
+// Importer le JS de Bootstrap
+import * as bootstrap from 'bootstrap';</div>
+        </div>
 
-DB_CONNECTION=mysql
+        <p class="mb-2 mt-4">Vérifiez que <code>vite.config.js</code> pointe bien vers <code>app.css</code> (par défaut) :</p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">JS (vite.config.js)</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: ['resources/css/app.css', 'resources/js/app.js'],
+            refresh: true,
+        }),
+    ],
+});</div>
+        </div>
+        
+        <p class="mb-2 mt-4">Et dans votre layout, appelez le CSS correctement :</p>
+        <div class="alert-info p-2 mt-2 mb-2 bg-blue-50 text-blue-800 text-sm">
+            @vite(['resources/css/app.css', 'resources/js/app.js'])
+        </div>
+
+        <h3 class="text-xl font-bold text-gray-800 mb-4 mt-8">étape 4 : Personnaliser le Style (app.css)</h3>
+        <p class="mb-2">Pour un look plus moderne (Police Inter, ombres, boutons...), ajoutez ceci :</p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">CSS (resources/css/app.css)</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">/* Importer une belle police */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa;
+    color: #1e293b;
+}
+
+/* Amélioration des cartes */
+.card {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+}
+
+/* Boutons plus modernes */
+.btn-primary {
+    background-color: #3b82f6; /* Bleu moderne */
+    border-color: #3b82f6;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+}
+
+.btn-primary:hover {
+    background-color: #2563eb;
+    border-color: #2563eb;
+}
+
+/* Navigation */
+.navbar {
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.95) !important;
+}
+</div>
+        </div>
+
+        <h3 class="text-xl font-bold text-gray-800 mb-4 mt-8">étape 5 : Configurer la BDD</h3>
+        <div class="code-block-wrapper">
+            <div class="code-lang">.ENV</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=boutique
+DB_DATABASE=boutique_db
 DB_USERNAME=root
-DB_PASSWORD=</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
+DB_PASSWORD=</div>
         </div>
         
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">Étape 4 : Installer les dépendances et lancer</h4>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">bash</span>
-                <pre class="code-block"><code><span class="token-comment"># Générer la clé d'application</span>
-php artisan key:generate
-
-<span class="token-comment"># Installer les dépendances Node.js</span>
-npm install
-
-<span class="token-comment"># Lancer les serveurs (2 terminaux)</span>
-<span class="token-comment"># Terminal 1 :</span>
-npm run dev
-
-<span class="token-comment"># Terminal 2 :</span>
-php artisan serve</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-            
-            <p class="text-gray-700 mt-4">
-                Visitez <a href="http://localhost:8000" class="text-blue-600 hover:underline">http://localhost:8000</a> 
-                pour voir la page d'accueil Laravel.
-            </p>
+        <p class="mt-4 mb-2">Lancez le serveur de développement :</p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">TERMINAL</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">npm run dev</div>
         </div>
         
-        <!-- Nouvelle section: Installation des dépendances Composer -->
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">Étape 5 : Installer les packages Composer requis</h4>
-            <p class="text-gray-700 mb-4">
-                Notre marketplace utilise plusieurs packages Spatie essentiels. Installez-les maintenant :
-            </p>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">bash</span>
-                <pre class="code-block"><code><span class="token-comment"># Packages Spatie essentiels</span>
-composer require spatie/laravel-medialibrary    <span class="token-comment"># Gestion des médias (images, fichiers)</span>
-composer require spatie/laravel-translatable    <span class="token-comment"># Champs multi-langues (JSON)</span>
-composer require spatie/laravel-permission      <span class="token-comment"># Rôles et permissions</span>
-composer require spatie/laravel-activitylog     <span class="token-comment"># Historique des modifications</span>
-
-<span class="token-comment"># Paiements (Stripe et PayPal)</span>
-composer require stripe/stripe-php              <span class="token-comment"># API Stripe</span>
-composer require srmklive/paypal                <span class="token-comment"># API PayPal</span>
-
-<span class="token-comment"># Authentification</span>
-composer require laravel/breeze --dev           <span class="token-comment"># UI d'authentification</span></code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-            
-            <div class="alert-info mt-4">
-                <strong>📖 Explication des packages :</strong>
-                <ul class="list-disc ml-6 mt-2 text-sm">
-                    <li><code>spatie/laravel-medialibrary</code> : Associe des fichiers (images, PDFs) aux modèles Eloquent, génère des miniatures automatiquement</li>
-                    <li><code>spatie/laravel-translatable</code> : Permet de stocker les traductions dans des champs JSON (<code>{"fr": "...", "en": "..."}</code>)</li>
-                    <li><code>spatie/laravel-permission</code> : Système complet de rôles (admin, vendor, customer) et permissions</li>
-                    <li><code>spatie/laravel-activitylog</code> : Enregistre automatiquement les modifications sur les modèles</li>
-                </ul>
-            </div>
+        <p class="mt-4 mb-2 text-red-600 font-bold">N'oubliez pas le lien de stockage :</p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">TERMINAL</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">php artisan storage:link</div>
         </div>
-        
-        <!-- Publier les migrations des packages -->
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">Étape 6 : Publier les fichiers de configuration et migrations</h4>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">bash</span>
-                <pre class="code-block"><code><span class="token-comment"># Publier les migrations Spatie Media Library</span>
-php artisan vendor:publish --provider="Spatie\MediaLibrary\MediaLibraryServiceProvider" --tag="medialibrary-migrations"
-
-<span class="token-comment"># Publier les migrations Spatie Permission</span>
-php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
-
-<span class="token-comment"># Publier les migrations Spatie Activity Log</span>
-php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider" --tag="activitylog-migrations"
-
-<span class="token-comment"># Créer le lien symbolique pour le stockage public</span>
-php artisan storage:link</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-            
-            <div class="alert-warning mt-4">
-                <strong>⚠️ Important :</strong> Ces commandes créent les tables nécessaires dans votre base de données. 
-                Elles seront exécutées avec <code>php artisan migrate</code> plus tard.
-            </div>
-        </div>
-        
-        <!-- Résumé composer.json -->
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">Récapitulatif : Votre composer.json</h4>
-            <p class="text-gray-700 mb-4">
-                Après installation, votre section <code>require</code> devrait ressembler à ceci :
-            </p>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">json</span>
-                <pre class="code-block"><code>{
-    "require": {
-        "php": "^8.2",
-        "laravel/framework": "^12.0",
-        "laravel/tinker": "^2.10",
-        "laravel/breeze": "^2.3",
-        "spatie/laravel-medialibrary": "^11.0",
-        "spatie/laravel-translatable": "^6.0",
-        "spatie/laravel-permission": "^6.0",
-        "spatie/laravel-activitylog": "^4.0",
-        "stripe/stripe-php": "^19.0",
-        "srmklive/paypal": "^3.0"
-    }
-}</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-        </div>
-    </div>
-    
-    <div class="text-right mt-8">
-        <a href="#page-top" class="text-sm font-semibold text-blue-600 hover:underline">↑ Retour en haut</a>
     </div>
 </section>
 
-<!-- ========== 1.3 MODÈLES PRODUCT & CATEGORY ========== -->
-<section id="seance1-models" class="mb-16">
-    <h3 class="text-2xl font-semibold mb-3">1.3 Modèles Product & Category (Migrations, Seeders)</h3>
-    
-    <div class="section-card space-y-8">
-        <!-- Modèle Category -->
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">1.3.1 Créer le modèle Category</h4>
-            <p class="text-gray-700 mb-4">Créons d'abord le modèle Category avec sa migration, son factory et son seeder :</p>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">bash</span>
-                <pre class="code-block"><code>php artisan make:model Category -mfs</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-            
-            <p class="text-gray-700 mt-4 mb-4">
-                Cette commande crée 4 fichiers : le modèle, la migration, le factory et le seeder. 
-                Modifions la migration :
-            </p>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">php</span>
-                <pre class="code-block"><code><span class="token-comment">// database/migrations/xxxx_create_categories_table.php</span>
+<!-- 1.3 Structure de la Base de Données -->
+<section id="seance1-migrations" class="mb-16 scroll-mt-20">
+    <div class="flex items-center mb-6">
+        <span class="badge-seance badge-seance-1 mr-3">Séance 1</span>
+        <h2 class="text-2xl font-bold text-gray-800">1.3 Structure des Tables</h2>
+    </div>
 
-<span class="token-keyword">public function</span> <span class="token-function">up</span>(): <span class="token-keyword">void</span>
-{
-    Schema::<span class="token-function">create</span>(<span class="token-string">'categories'</span>, <span class="token-keyword">function</span> (Blueprint <span class="token-variable">$table</span>) {
-        <span class="token-variable">$table</span>-><span class="token-function">id</span>();
-        
-        <span class="token-comment">// Catégorie parente (pour sous-catégories)</span>
-        <span class="token-variable">$table</span>-><span class="token-function">foreignId</span>(<span class="token-string">'parent_id'</span>)
-            -><span class="token-function">nullable</span>()
-            -><span class="token-function">constrained</span>(<span class="token-string">'categories'</span>)
-            -><span class="token-function">nullOnDelete</span>();
-        
-        <span class="token-comment">// Champs JSON pour traductions (Spatie Translatable)</span>
-        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'name'</span>);
-        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'description'</span>)-><span class="token-function">nullable</span>();
-        
-        <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'slug'</span>)-><span class="token-function">unique</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'image'</span>)-><span class="token-function">nullable</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'icon'</span>)-><span class="token-function">nullable</span>();
-        
-        <span class="token-variable">$table</span>-><span class="token-function">boolean</span>(<span class="token-string">'is_active'</span>)-><span class="token-function">default</span>(<span class="token-keyword">true</span>);
-        <span class="token-variable">$table</span>-><span class="token-function">integer</span>(<span class="token-string">'order'</span>)-><span class="token-function">default</span>(<span class="token-number">0</span>);
-        
-        <span class="token-comment">// SEO</span>
-        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'meta_title'</span>)-><span class="token-function">nullable</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'meta_description'</span>)-><span class="token-function">nullable</span>();
-        
-        <span class="token-variable">$table</span>-><span class="token-function">timestamps</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">softDeletes</span>();
-    });
-}</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-            
-            <!-- Explications des champs -->
-            <div class="alert-info mt-4">
-                <strong>📖 Explication des champs avancés :</strong>
-                <ul class="list-disc ml-6 mt-2 text-sm">
-                    <li><code>parent_id</code> : Permet de créer une hiérarchie (catégorie → sous-catégorie)</li>
-                    <li><code>json('name')</code> : Stockage JSON pour traductions multi-langues via <strong>Spatie Translatable</strong></li>
-                    <li><code>order</code> : Permet de trier les catégories à l'affichage</li>
-                    <li><code>meta_title, meta_description</code> : Balises SEO traduisibles</li>
-                    <li><code>softDeletes()</code> : Suppression logique (les données ne sont pas vraiment effacées)</li>
-                </ul>
-            </div>
-            
-            <div class="alert-warning mt-4">
-                <strong>⚠️ Spatie Translatable :</strong> Les champs <code>json()</code> permettent de stocker 
-                les traductions. Par exemple : <code>{"fr": "Livres", "en": "Books"}</code>
-            </div>
+    <div class="section-card">
+        <p class="mb-4">Nous allons créer les tables <code>users</code>, <code>stores</code>, <code>products</code> et <code>categories</code>.</p>
+
+        <h4 class="font-bold text-blue-600 mb-2">A. Table Stores (Boutiques)</h4>
+        <div class="code-block-wrapper">
+            <div class="code-lang">TERMINAL</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">php artisan make:model Store -m</div>
         </div>
         
-        <!-- Modèle Category complet -->
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">Le modèle Category (complet)</h4>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">php</span>
-                <pre class="code-block"><code><span class="token-comment">// app/Models/Category.php</span>
-
-<span class="token-preprocessor">&lt;?php</span>
-
-<span class="token-keyword">namespace</span> <span class="token-namespace">App\Models</span>;
-
-<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\Model</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\SoftDeletes</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\Relations\BelongsTo</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\Relations\BelongsToMany</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\Relations\HasMany</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Support\Str</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Spatie\MediaLibrary\HasMedia</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Spatie\MediaLibrary\InteractsWithMedia</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Spatie\Translatable\HasTranslations</span>;
-
-<span class="token-keyword">class</span> <span class="token-class-name">Category</span> <span class="token-keyword">extends</span> <span class="token-class-name">Model</span> <span class="token-keyword">implements</span> <span class="token-class-name">HasMedia</span>
+        <p class="text-sm mt-3 mb-2">Modifiez la migration <code>create_stores_table.php</code> :</p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">public function up(): void
 {
-    <span class="token-keyword">use</span> SoftDeletes, InteractsWithMedia, HasTranslations;
+    Schema::create('stores', function (Blueprint $table) {
+        $table->id();
+        
+        // Vendeur propriétaire (Sera relié à users)
+        $table->foreignId('user_id')->constrained()->onDelete('cascade');
+        
+        $table->string('name');
+        $table->string('slug')->unique();
+        $table->text('description')->nullable();
+        
+        $table->boolean('is_active')->default(true);
+        $table->boolean('is_featured')->default(false);
+        $table->timestamp('verified_at')->nullable();
+        $table->timestamp('suspended_at')->nullable();
+        
+        // Stats dénormalisées (pour performance)
+        $table->unsignedInteger('products_count')->default(0);
+        $table->unsignedInteger('orders_count')->default(0);
+        
+        $table->timestamps();
+        $table->softDeletes();
+    });
+}</div>
+        </div>
 
-    <span class="token-comment">// Champs traduisibles</span>
-    <span class="token-keyword">public array</span> <span class="token-variable">$translatable</span> = [<span class="token-string">'name'</span>, <span class="token-string">'description'</span>, <span class="token-string">'meta_title'</span>, <span class="token-string">'meta_description'</span>];
+        <h4 class="font-bold text-blue-600 mb-2 mt-6">B. Table Categories</h4>
+        <div class="code-block-wrapper">
+            <div class="code-lang">TERMINAL</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">php artisan make:model Category -m</div>
+        </div>
+        
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP (create_categories_table.php)</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">public function up(): void
+{
+    Schema::create('categories', function (Blueprint $table) {
+        $table->id();
+        
+        $table->foreignId('parent_id')->nullable()->constrained('categories')->nullOnDelete();
+        
+        // JSON pour Spatie Translatable
+        $table->json('name'); 
+        $table->json('description')->nullable();
+        
+        $table->string('slug')->unique();
+        $table->string('image')->nullable();
+        $table->string('icon')->nullable();
+        
+        $table->boolean('is_active')->default(true);
+        $table->integer('order')->default(0);
+        
+        $table->timestamps();
+        $table->softDeletes();
+        
+        $table->index('is_active');
+        $table->index('order');
+    });
+}</div>
+        </div>
+        
+        <h4 class="font-bold text-blue-600 mb-2 mt-6">C. Table Products</h4>
+        <div class="code-block-wrapper">
+            <div class="code-lang">TERMINAL</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">php artisan make:model Product -m</div>
+        </div>
+        
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP (create_products_table.php)</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">public function up(): void
+{
+    Schema::create('products', function (Blueprint $table) {
+        $table->id();
+        
+        // Relation avec Store
+        $table->foreignId('store_id')->constrained()->onDelete('cascade');
+        
+        // Champs traduisibles (JSON)
+        $table->json('name');
+        $table->string('slug')->unique();
+        $table->json('description')->nullable();
+        $table->json('short_description')->nullable();
+        
+        $table->enum('type', ['digital', 'subscription', 'course', 'license'])->default('digital');
+        
+        $table->decimal('price', 10, 2);
+        $table->decimal('compare_price', 10, 2)->nullable();
+        $table->string('currency', 3)->default('EUR');
+        
+        $table->integer('stock')->nullable();
+        $table->boolean('track_stock')->default(false);
+        
+        $table->string('main_file')->nullable();
+        $table->string('preview_file')->nullable();
+        
+        $table->boolean('is_active')->default(true);
+        $table->boolean('is_featured')->default(false);
+        $table->boolean('is_new')->default(true);
+        $table->timestamp('published_at')->nullable();
+        
+        // Stats
+        $table->unsignedInteger('views_count')->default(0);
+        $table->unsignedInteger('sales_count')->default(0);
+        $table->decimal('average_rating', 3, 2)->default(0);
+        $table->unsignedInteger('reviews_count')->default(0);
 
-    <span class="token-keyword">protected</span> <span class="token-variable">$fillable</span> = [
-        <span class="token-string">'parent_id'</span>, <span class="token-string">'name'</span>, <span class="token-string">'description'</span>, <span class="token-string">'slug'</span>, <span class="token-string">'image'</span>, <span class="token-string">'icon'</span>,
-        <span class="token-string">'is_active'</span>, <span class="token-string">'order'</span>, <span class="token-string">'meta_title'</span>, <span class="token-string">'meta_description'</span>,
+        $table->timestamps();
+        $table->softDeletes();
+        
+        $table->index('is_active');
+    });
+}</div>
+        </div>
+
+        <h4 class="font-bold text-blue-600 mb-2 mt-6">D. Table Pivot Product_Category</h4>
+        <p class="text-sm">Pour lier les produits aux catégories.</p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">TERMINAL</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">php artisan make:migration create_product_category_table</div>
+        </div>
+        
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">public function up(): void
+{
+    Schema::create('product_category', function (Blueprint $table) {
+        $table->foreignId('product_id')->constrained()->onDelete('cascade');
+        $table->foreignId('category_id')->constrained()->onDelete('cascade');
+        $table->primary(['product_id', 'category_id']);
+    });
+}</div>
+        </div>
+        
+        <p class="font-bold text-red-600 mt-4">Lancez les migrations maintenant :</p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">TERMINAL</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">php artisan migrate</div>
+        </div>
+    </div>
+</section>
+
+<!-- 1.4 Modèles Éloquent -->
+<section id="seance1-models" class="mb-16 scroll-mt-20">
+    <div class="flex items-center mb-6">
+        <span class="badge-seance badge-seance-1 mr-3">Séance 1</span>
+        <h2 class="text-2xl font-bold text-gray-800">1.4 Modèles (Configuration Spatie)</h2>
+    </div>
+    
+    <div class="section-card">
+        <h4 class="font-bold text-gray-800 mb-2">Modèle Product.php</h4>
+        <p class="mb-2">Utilisez <code>HasTranslations</code> pour le nom et la description, et configurez l'accesseur pour les images (LoremFlickr).</p>
+        
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP (app/Models/Product.php)</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Translatable\HasTranslations;
+use Illuminate\Support\Str;
+
+class Product extends Model
+{
+    use SoftDeletes, HasTranslations;
+
+    // Champs traduisibles
+    public array $translatable = [\'name\', \'description\', \'short_description\'];
+
+    protected $fillable = [
+        \'store_id\', \'name\', \'slug\', \'description\', \'type\', 
+        \'price\', \'compare_price\', \'is_active\', \'is_featured\', \'published_at\'
     ];
 
-    <span class="token-keyword">protected static function</span> <span class="token-function">boot</span>()
-    {
-        <span class="token-keyword">parent</span>::boot();
-        <span class="token-keyword">static</span>::<span class="token-function">creating</span>(<span class="token-keyword">function</span> (<span class="token-variable">$category</span>) {
-            <span class="token-keyword">if</span> (empty(<span class="token-variable">$category</span>->slug)) {
-                <span class="token-variable">$name</span> = <span class="token-function">is_array</span>(<span class="token-variable">$category</span>->name) 
-                    ? (<span class="token-variable">$category</span>->name[<span class="token-string">'fr'</span>] ?? reset(<span class="token-variable">$category</span>->name)) 
-                    : <span class="token-variable">$category</span>->name;
-                <span class="token-variable">$category</span>->slug = Str::<span class="token-function">slug</span>(<span class="token-variable">$name</span>);
-            }
-        });
-    }
-
-    <span class="token-keyword">public function</span> <span class="token-function">registerMediaCollections</span>(): <span class="token-keyword">void</span>
-    {
-        <span class="token-variable">$this</span>-><span class="token-function">addMediaCollection</span>(<span class="token-string">'image'</span>)-><span class="token-function">singleFile</span>();
-    }
-
-    <span class="token-comment">// Relations</span>
-    <span class="token-keyword">public function</span> <span class="token-function">parent</span>(): <span class="token-class-name">BelongsTo</span> { <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">belongsTo</span>(Category::<span class="token-keyword">class</span>, <span class="token-string">'parent_id'</span>); }
-    <span class="token-keyword">public function</span> <span class="token-function">children</span>(): <span class="token-class-name">HasMany</span> { <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">hasMany</span>(Category::<span class="token-keyword">class</span>, <span class="token-string">'parent_id'</span>); }
-    <span class="token-keyword">public function</span> <span class="token-function">products</span>(): <span class="token-class-name">BelongsToMany</span> { <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">belongsToMany</span>(Product::<span class="token-keyword">class</span>, <span class="token-string">'product_category'</span>); }
-
-    <span class="token-comment">// Accesseurs</span>
-    <span class="token-keyword">public function</span> <span class="token-function">getImageUrlAttribute</span>(): <span class="token-keyword">string</span>
-    {
-        <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">hasMedia</span>(<span class="token-string">'image'</span>) 
-            ? <span class="token-variable">$this</span>-><span class="token-function">getFirstMediaUrl</span>(<span class="token-string">'image'</span>) 
-            : asset(<span class="token-string">'images/default-category.jpg'</span>);
-    }
-
-    <span class="token-comment">// Scopes</span>
-    <span class="token-keyword">public function</span> <span class="token-function">scopeActive</span>(<span class="token-variable">$query</span>) { <span class="token-keyword">return</span> <span class="token-variable">$query</span>-><span class="token-function">where</span>(<span class="token-string">'is_active'</span>, <span class="token-keyword">true</span>); }
-    <span class="token-keyword">public function</span> <span class="token-function">scopeParents</span>(<span class="token-variable">$query</span>) { <span class="token-keyword">return</span> <span class="token-variable">$query</span>-><span class="token-function">whereNull</span>(<span class="token-string">'parent_id'</span>); }
-    <span class="token-keyword">public function</span> <span class="token-function">scopeOrdered</span>(<span class="token-variable">$query</span>) { <span class="token-keyword">return</span> <span class="token-variable">$query</span>-><span class="token-function">orderBy</span>(<span class="token-string">'order'</span>)-><span class="token-function">orderBy</span>(<span class="token-string">'name'</span>); }
-}</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-            
-            <!-- Explications du modèle -->
-            <div class="alert-info mt-4">
-                <strong>📖 Concepts avancés du modèle :</strong>
-                <ul class="list-disc ml-6 mt-2 text-sm">
-                    <li><code>implements HasMedia</code> : Interface pour Spatie Media Library</li>
-                    <li><code>HasTranslations</code> : Trait pour les champs multi-langues</li>
-                    <li><code>$translatable</code> : Liste les champs traduisibles</li>
-                    <li><code>boot()</code> : Génère automatiquement le slug à la création</li>
-                    <li><code>parent() / children()</code> : Relations auto-référentielles pour hiérarchie</li>
-                    <li><code>scopeActive()</code> : Permet d'écrire <code>Category::active()->get()</code></li>
-                </ul>
-            </div>
-        </div>
-        
-        <!-- Modèle Product -->
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">1.3.2 Créer le modèle Product</h4>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">bash</span>
-                <pre class="code-block"><code>php artisan make:model Product -mfs</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-            
-            <p class="text-gray-700 mt-4 mb-4">Migration du modèle Product (version complète) :</p>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">php</span>
-                <pre class="code-block"><code><span class="token-comment">// database/migrations/xxxx_create_products_table.php</span>
-
-<span class="token-keyword">public function</span> <span class="token-function">up</span>(): <span class="token-keyword">void</span>
-{
-    Schema::<span class="token-function">create</span>(<span class="token-string">'products'</span>, <span class="token-keyword">function</span> (Blueprint <span class="token-variable">$table</span>) {
-        <span class="token-variable">$table</span>-><span class="token-function">id</span>();
-        
-        <span class="token-comment">// Boutique vendeur (sera lié en Séance 3)</span>
-        <span class="token-variable">$table</span>-><span class="token-function">unsignedBigInteger</span>(<span class="token-string">'store_id'</span>)-><span class="token-function">nullable</span>();
-        <span class="token-comment">// La contrainte sera ajoutée en Séance 3 après création de la table stores</span>
-        
-        <span class="token-comment">// Champs traduisibles (JSON pour Spatie Translatable)</span>
-        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'name'</span>);
-        <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'slug'</span>)-><span class="token-function">unique</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'description'</span>)-><span class="token-function">nullable</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'short_description'</span>)-><span class="token-function">nullable</span>();
-        
-        <span class="token-comment">// Type de produit numérique</span>
-        <span class="token-variable">$table</span>-><span class="token-function">enum</span>(<span class="token-string">'type'</span>, [<span class="token-string">'digital'</span>, <span class="token-string">'subscription'</span>, <span class="token-string">'course'</span>, <span class="token-string">'license'</span>])
-            -><span class="token-function">default</span>(<span class="token-string">'digital'</span>);
-        
-        <span class="token-comment">// Prix</span>
-        <span class="token-variable">$table</span>-><span class="token-function">decimal</span>(<span class="token-string">'price'</span>, <span class="token-number">10</span>, <span class="token-number">2</span>);
-        <span class="token-variable">$table</span>-><span class="token-function">decimal</span>(<span class="token-string">'compare_price'</span>, <span class="token-number">10</span>, <span class="token-number">2</span>)-><span class="token-function">nullable</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'currency'</span>, <span class="token-number">3</span>)-><span class="token-function">default</span>(<span class="token-string">'EUR'</span>);
-        
-        <span class="token-comment">// Stock (pour licences limitées)</span>
-        <span class="token-variable">$table</span>-><span class="token-function">integer</span>(<span class="token-string">'stock'</span>)-><span class="token-function">nullable</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">boolean</span>(<span class="token-string">'track_stock'</span>)-><span class="token-function">default</span>(<span class="token-keyword">false</span>);
-        
-        <span class="token-comment">// Fichiers</span>
-        <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'main_file'</span>)-><span class="token-function">nullable</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">string</span>(<span class="token-string">'preview_file'</span>)-><span class="token-function">nullable</span>();
-        
-        <span class="token-comment">// Téléchargements</span>
-        <span class="token-variable">$table</span>-><span class="token-function">integer</span>(<span class="token-string">'max_downloads'</span>)-><span class="token-function">default</span>(<span class="token-number">3</span>);
-        <span class="token-variable">$table</span>-><span class="token-function">integer</span>(<span class="token-string">'download_expiry_days'</span>)-><span class="token-function">default</span>(<span class="token-number">30</span>);
-        
-        <span class="token-comment">// Statut</span>
-        <span class="token-variable">$table</span>-><span class="token-function">boolean</span>(<span class="token-string">'is_active'</span>)-><span class="token-function">default</span>(<span class="token-keyword">true</span>);
-        <span class="token-variable">$table</span>-><span class="token-function">boolean</span>(<span class="token-string">'is_featured'</span>)-><span class="token-function">default</span>(<span class="token-keyword">false</span>);
-        <span class="token-variable">$table</span>-><span class="token-function">timestamp</span>(<span class="token-string">'published_at'</span>)-><span class="token-function">nullable</span>();
-        
-        <span class="token-comment">// SEO</span>
-        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'meta_title'</span>)-><span class="token-function">nullable</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">json</span>(<span class="token-string">'meta_description'</span>)-><span class="token-function">nullable</span>();
-        
-        <span class="token-comment">// Statistiques</span>
-        <span class="token-variable">$table</span>-><span class="token-function">unsignedInteger</span>(<span class="token-string">'views_count'</span>)-><span class="token-function">default</span>(<span class="token-number">0</span>);
-        <span class="token-variable">$table</span>-><span class="token-function">unsignedInteger</span>(<span class="token-string">'sales_count'</span>)-><span class="token-function">default</span>(<span class="token-number">0</span>);
-        <span class="token-variable">$table</span>-><span class="token-function">decimal</span>(<span class="token-string">'average_rating'</span>, <span class="token-number">3</span>, <span class="token-number">2</span>)-><span class="token-function">default</span>(<span class="token-number">0</span>);
-        <span class="token-variable">$table</span>-><span class="token-function">unsignedInteger</span>(<span class="token-string">'reviews_count'</span>)-><span class="token-function">default</span>(<span class="token-number">0</span>);
-        
-        <span class="token-variable">$table</span>-><span class="token-function">timestamps</span>();
-        <span class="token-variable">$table</span>-><span class="token-function">softDeletes</span>();
-        
-        <span class="token-comment">// Index pour optimiser les requêtes</span>
-        <span class="token-variable">$table</span>-><span class="token-function">index</span>(<span class="token-string">'store_id'</span>);
-    });
-}</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-            
-            <div class="alert-warning mt-4">
-                <strong>⚠️ Note importante :</strong> Le champ <code>store_id</code> est créé sans contrainte de clé étrangère 
-                car la table <code>stores</code> n'existe pas encore. En <strong>Séance 3</strong>, nous créerons la table 
-                <code>stores</code> et ajouterons la contrainte avec une migration séparée :
-                <pre class="bg-yellow-50 p-2 mt-2 rounded text-sm overflow-x-auto"><code>// Séance 3 : add_foreign_key_to_products
-Schema::table('products', function (Blueprint $table) {
-    $table->foreign('store_id')->references('id')->on('stores')->cascadeOnDelete();
-});</code></pre>
-            </div>
-            
-            <div class="alert-info mt-4">
-                <strong>📖 Champs clés de la migration :</strong>
-                <ul class="list-disc ml-6 mt-2 text-sm">
-                    <li><code>store_id</code> : Sera lié à une boutique vendeur (Séance 3)</li>
-                    <li><code>type</code> : digital, subscription, course, license</li>
-                    <li><code>compare_price</code> : Ancien prix barré (pour afficher une promotion)</li>
-                    <li><code>max_downloads / download_expiry_days</code> : Limites de téléchargement</li>
-                    <li><code>views_count, sales_count, average_rating</code> : Statistiques</li>
-                </ul>
-            </div>
-        </div>
-        
-        <!-- Modèle Product complet -->
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">Le modèle Product (complet)</h4>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">php</span>
-                <pre class="code-block"><code><span class="token-comment">// app/Models/Product.php</span>
-
-<span class="token-preprocessor">&lt;?php</span>
-
-<span class="token-keyword">namespace</span> <span class="token-namespace">App\Models</span>;
-
-<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\Model</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\SoftDeletes</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\Relations\BelongsTo</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Eloquent\Relations\BelongsToMany</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Support\Str</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Spatie\MediaLibrary\HasMedia</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Spatie\MediaLibrary\InteractsWithMedia</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Spatie\Translatable\HasTranslations</span>;
-
-<span class="token-keyword">class</span> <span class="token-class-name">Product</span> <span class="token-keyword">extends</span> <span class="token-class-name">Model</span> <span class="token-keyword">implements</span> <span class="token-class-name">HasMedia</span>
-{
-    <span class="token-keyword">use</span> SoftDeletes, InteractsWithMedia, HasTranslations;
-
-    <span class="token-comment">// Champs traduisibles</span>
-    <span class="token-keyword">public array</span> <span class="token-variable">$translatable</span> = [<span class="token-string">'name'</span>, <span class="token-string">'description'</span>, <span class="token-string">'short_description'</span>];
-
-    <span class="token-keyword">protected</span> <span class="token-variable">$fillable</span> = [
-        <span class="token-string">'store_id'</span>, <span class="token-string">'name'</span>, <span class="token-string">'slug'</span>, <span class="token-string">'description'</span>, <span class="token-string">'short_description'</span>,
-        <span class="token-string">'type'</span>, <span class="token-string">'price'</span>, <span class="token-string">'compare_price'</span>, <span class="token-string">'currency'</span>,
-        <span class="token-string">'is_active'</span>, <span class="token-string">'is_featured'</span>, <span class="token-string">'published_at'</span>,
-        <span class="token-string">'max_downloads'</span>, <span class="token-string">'download_expiry_days'</span>,
+    protected $casts = [
+        \'price\' => \'decimal:2\',
+        \'is_active\' => \'boolean\',
+        \'published_at\' => \'datetime\',
     ];
 
-    <span class="token-keyword">protected function</span> <span class="token-function">casts</span>(): <span class="token-keyword">array</span>
+    // Relations
+    public function store(): BelongsTo { return $this->belongsTo(Store::class); }
+    public function categories(): BelongsToMany { return $this->belongsToMany(Category::class, \'product_category\'); }
+
+    // Accessors
+    public function getFormattedPriceAttribute()
     {
-        <span class="token-keyword">return</span> [
-            <span class="token-string">'price'</span> => <span class="token-string">'decimal:2'</span>,
-            <span class="token-string">'compare_price'</span> => <span class="token-string">'decimal:2'</span>,
-            <span class="token-string">'is_active'</span> => <span class="token-string">'boolean'</span>,
-            <span class="token-string">'is_featured'</span> => <span class="token-string">'boolean'</span>,
-            <span class="token-string">'published_at'</span> => <span class="token-string">'datetime'</span>,
-        ];
+        return number_format($this->price, 2, \',\', \' \') . \' €\';
     }
 
-    <span class="token-keyword">protected static function</span> <span class="token-function">boot</span>()
+    public function getThumbnailUrlAttribute()
     {
-        <span class="token-keyword">parent</span>::boot();
-        <span class="token-keyword">static</span>::<span class="token-function">creating</span>(<span class="token-keyword">function</span> (<span class="token-variable">$product</span>) {
-            <span class="token-keyword">if</span> (empty(<span class="token-variable">$product</span>->slug)) {
-                <span class="token-variable">$name</span> = is_array(<span class="token-variable">$product</span>->name) 
-                    ? (<span class="token-variable">$product</span>->name[<span class="token-string">'fr'</span>] ?? reset(<span class="token-variable">$product</span>->name)) 
-                    : <span class="token-variable">$product</span>->name;
-                <span class="token-variable">$product</span>->slug = Str::<span class="token-function">slug</span>(<span class="token-variable">$name</span>);
-            }
-        });
+        // Image de technologie via LoremFlickr (stable) avec lock sur l\'ID pour la consistance
+        return "https://loremflickr.com/400/300/computer,technology?lock=" . $this->id;
     }
-
-    <span class="token-comment">// Relations</span>
-    <span class="token-keyword">public function</span> <span class="token-function">store</span>(): <span class="token-class-name">BelongsTo</span> 
-    { 
-        <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">belongsTo</span>(Store::<span class="token-keyword">class</span>); 
-    }
-    
-    <span class="token-comment">// Relation Many-to-Many avec les catégories</span>
-    <span class="token-keyword">public function</span> <span class="token-function">categories</span>(): <span class="token-class-name">BelongsToMany</span> 
-    { 
-        <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">belongsToMany</span>(Category::<span class="token-keyword">class</span>, <span class="token-string">'product_category'</span>); 
-    }
-
-    <span class="token-comment">// Accesseur pour l'URL de la miniature</span>
-    <span class="token-keyword">public function</span> <span class="token-function">getThumbnailUrlAttribute</span>(): <span class="token-keyword">string</span>
-    {
-        <span class="token-keyword">if</span> (<span class="token-variable">$this</span>-><span class="token-function">hasMedia</span>(<span class="token-string">'thumbnail'</span>)) {
-            <span class="token-keyword">return</span> <span class="token-variable">$this</span>-><span class="token-function">getFirstMediaUrl</span>(<span class="token-string">'thumbnail'</span>);
-        }
-        
-        <span class="token-comment">// Fallback: Images Unsplash selon le type</span>
-        <span class="token-variable">$unsplashIds</span> = [
-            <span class="token-string">'digital'</span> => <span class="token-string">'1544716278-ca5e3f4abd8c'</span>,
-            <span class="token-string">'course'</span> => <span class="token-string">'1516321318423-f06f85e504b3'</span>,
-            <span class="token-string">'subscription'</span> => <span class="token-string">'1460925895917-afdab827c52f'</span>,
-            <span class="token-string">'license'</span> => <span class="token-string">'1555066931-4365d14bab8c'</span>,
-        ];
-        <span class="token-variable">$imageId</span> = <span class="token-variable">$unsplashIds</span>[<span class="token-variable">$this</span>->type] ?? <span class="token-variable">$unsplashIds</span>[<span class="token-string">'digital'</span>];
-        <span class="token-keyword">return</span> <span class="token-string">"https://images.unsplash.com/photo-{$imageId}?w=400&amp;h=300&amp;fit=crop"</span>;
-    }
-    
-    <span class="token-comment">// Scopes</span>
-    <span class="token-keyword">public function</span> <span class="token-function">scopeActive</span>(<span class="token-variable">$query</span>) { <span class="token-keyword">return</span> <span class="token-variable">$query</span>-><span class="token-function">where</span>(<span class="token-string">'is_active'</span>, <span class="token-keyword">true</span>); }
-    <span class="token-keyword">public function</span> <span class="token-function">scopeFeatured</span>(<span class="token-variable">$query</span>) { <span class="token-keyword">return</span> <span class="token-variable">$query</span>-><span class="token-function">where</span>(<span class="token-string">'is_featured'</span>, <span class="token-keyword">true</span>); }
-}</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-            
-            <div class="alert-info mt-4">
-                <strong>📖 Points clés du modèle Product :</strong>
-                <ul class="list-disc ml-6 mt-2 text-sm">
-                    <li><code>HasTranslations</code> : name, description sont des tableaux JSON multi-langues</li>
-                    <li><code>store()</code> : Relation vers la boutique (sera null en Séance 1, lié en Séance 3)</li>
-                    <li><code>categories()</code> : Relation <strong>Many-to-Many</strong> via table pivot <code>product_category</code></li>
-                    <li><code>boot()</code> : Génère automatiquement le slug à partir du nom français</li>
-                </ul>
-            </div>
+}') ?></div>
         </div>
         
-        <!-- Seeders -->
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">1.3.3 Créer les Seeders</h4>
-            <p class="text-gray-700 mb-4">Créons des données de démonstration :</p>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">php</span>
-                <pre class="code-block"><code><span class="token-comment">// database/seeders/CategorySeeder.php</span>
-
-<span class="token-preprocessor">&lt;?php</span>
-
-<span class="token-keyword">namespace</span> <span class="token-namespace">Database\Seeders</span>;
-
-<span class="token-keyword">use</span> <span class="token-class-name">App\Models\Category</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Seeder</span>;
-
-<span class="token-keyword">class</span> <span class="token-class-name">CategorySeeder</span> <span class="token-keyword">extends</span> <span class="token-class-name">Seeder</span>
+        <p class="mt-4 font-bold text-gray-800 mb-2">Modèle Store.php</p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP (app/Models/Store.php)</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('class Store extends Model
 {
-    <span class="token-keyword">public function</span> <span class="token-function">run</span>(): <span class="token-keyword">void</span>
-    {
-        <span class="token-comment">// Champs JSON pour Translatable</span>
-        <span class="token-variable">$categories</span> = [
-            [<span class="token-string">'name'</span> => [<span class="token-string">'fr'</span> => <span class="token-string">'E-Books'</span>], <span class="token-string">'slug'</span> => <span class="token-string">'ebooks'</span>, <span class="token-string">'icon'</span> => <span class="token-string">'bi-book'</span>],
-            [<span class="token-string">'name'</span> => [<span class="token-string">'fr'</span> => <span class="token-string">'Logiciels'</span>], <span class="token-string">'slug'</span> => <span class="token-string">'software'</span>, <span class="token-string">'icon'</span> => <span class="token-string">'bi-cpu'</span>],
-            [<span class="token-string">'name'</span> => [<span class="token-string">'fr'</span> => <span class="token-string">'Templates'</span>], <span class="token-string">'slug'</span> => <span class="token-string">'templates'</span>, <span class="token-string">'icon'</span> => <span class="token-string">'bi-layout-wtf'</span>],
-            [<span class="token-string">'name'</span> => [<span class="token-string">'fr'</span> => <span class="token-string">'Musique'</span>], <span class="token-string">'slug'</span> => <span class="token-string">'music'</span>, <span class="token-string">'icon'</span> => <span class="token-string">'bi-music-note'</span>],
-            [<span class="token-string">'name'</span> => [<span class="token-string">'fr'</span> => <span class="token-string">'Graphisme'</span>], <span class="token-string">'slug'</span> => <span class="token-string">'graphics'</span>, <span class="token-string">'icon'</span> => <span class="token-string">'bi-palette'</span>],
-        ];
-
-        <span class="token-keyword">foreach</span> (<span class="token-variable">$categories</span> <span class="token-keyword">as</span> <span class="token-variable">$category</span>) {
-            Category::<span class="token-function">create</span>(<span class="token-variable">$category</span>);
-        }
-    }
-}</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-            
-            <div class="code-block-wrapper mt-6">
-                <span class="code-lang">php</span>
-                <pre class="code-block"><code><span class="token-comment">// database/seeders/ProductSeeder.php</span>
-
-<span class="token-preprocessor">&lt;?php</span>
-
-<span class="token-keyword">namespace</span> <span class="token-namespace">Database\Seeders</span>;
-
-<span class="token-keyword">use</span> <span class="token-class-name">App\Models\Category</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">App\Models\Product</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Database\Seeder</span>;
-
-<span class="token-keyword">class</span> <span class="token-class-name">ProductSeeder</span> <span class="token-keyword">extends</span> <span class="token-class-name">Seeder</span>
-{
-    <span class="token-keyword">public function</span> <span class="token-function">run</span>(): <span class="token-keyword">void</span>
-    {
-        <span class="token-variable">$products</span> = [
-            [
-                <span class="token-string">'category_slug'</span> =&gt; <span class="token-string">'ebooks'</span>,  <span class="token-comment">// Doit correspondre au slug dans CategorySeeder</span>
-                <span class="token-comment">// Champs JSON pour Translatable</span>
-                <span class="token-string">'name'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'Guide Laravel 12'</span>, <span class="token-string">'en'</span> =&gt; <span class="token-string">'Laravel 12 Guide'</span>],
-                <span class="token-string">'description'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'Le guide complet pour maîtriser Laravel 12'</span>],
-                <span class="token-string">'type'</span> =&gt; <span class="token-string">'course'</span>,
-                <span class="token-string">'price'</span> =&gt; <span class="token-number">29.99</span>,
-            ],
-            [
-                <span class="token-string">'category_slug'</span> =&gt; <span class="token-string">'software'</span>,  <span class="token-comment">// Doit correspondre au slug dans CategorySeeder</span>
-                <span class="token-string">'name'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'DevTools Pro'</span>, <span class="token-string">'en'</span> =&gt; <span class="token-string">'DevTools Pro'</span>],
-                <span class="token-string">'description'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'Suite d\'outils pour développeurs'</span>],
-                <span class="token-string">'type'</span> =&gt; <span class="token-string">'license'</span>,
-                <span class="token-string">'price'</span> =&gt; <span class="token-number">49.99</span>,
-            ],
-            [
-                <span class="token-string">'category_slug'</span> =&gt; <span class="token-string">'templates'</span>,  <span class="token-comment">// Doit correspondre au slug dans CategorySeeder</span>
-                <span class="token-string">'name'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'Template Dashboard'</span>, <span class="token-string">'en'</span> =&gt; <span class="token-string">'Dashboard Template'</span>],
-                <span class="token-string">'description'</span> =&gt; [<span class="token-string">'fr'</span> =&gt; <span class="token-string">'Template admin moderne avec Bootstrap'</span>],
-                <span class="token-string">'type'</span> =&gt; <span class="token-string">'digital'</span>,
-                <span class="token-string">'price'</span> =&gt; <span class="token-number">19.99</span>,
-            ],
-        ];
-
-        <span class="token-keyword">foreach</span> (<span class="token-variable">$products</span> <span class="token-keyword">as</span> <span class="token-variable">$productData</span>) {
-            <span class="token-comment">// Récupérer la catégorie par son slug</span>
-            <span class="token-variable">$category</span> = Category::<span class="token-function">where</span>(<span class="token-string">'slug'</span>, <span class="token-variable">$productData</span>[<span class="token-string">'category_slug'</span>])-&gt;<span class="token-function">first</span>();
-            <span class="token-function">unset</span>(<span class="token-variable">$productData</span>[<span class="token-string">'category_slug'</span>]);
-
-            <span class="token-comment">// Créer le produit (store_id sera null, lié en Séance 3)</span>
-            <span class="token-variable">$product</span> = Product::<span class="token-function">create</span>([
-                ...<span class="token-variable">$productData</span>,
-                <span class="token-string">'short_description'</span> =&gt; <span class="token-variable">$productData</span>[<span class="token-string">'description'</span>],
-                <span class="token-string">'is_active'</span> =&gt; <span class="token-keyword">true</span>,
-                <span class="token-string">'published_at'</span> =&gt; <span class="token-function">now</span>(),
-            ]);
-
-            <span class="token-comment">// Attacher la catégorie via la table pivot (relation N:M)</span>
-            <span class="token-keyword">if</span> (<span class="token-variable">$category</span>) {
-                <span class="token-variable">$product</span>-&gt;<span class="token-function">categories</span>()-&gt;<span class="token-function">attach</span>(<span class="token-variable">$category</span>-&gt;id);
-            }
-        }
-    }
-}</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-            
-            <div class="alert-warning mt-4">
-                <strong>⚠️ Attention :</strong> 
-                <ul class="list-disc ml-6 mt-2 text-sm">
-                    <li>Les champs <code>name</code> et <code>description</code> sont des tableaux JSON (Spatie Translatable)</li>
-                    <li>Le <code>store_id</code> est <code>null</code> pour l'instant (sera assigné en Séance 3)</li>
-                    <li>La relation catégorie utilise <code>attach()</code> car c'est une relation Many-to-Many</li>
-                </ul>
-            </div>
-            
-            <div class="alert-info mt-4">
-                <strong>📖 Table pivot product_category :</strong> N'oubliez pas de créer cette migration :
-                <pre class="bg-blue-50 p-2 mt-2 rounded text-xs overflow-x-auto"><code>// database/migrations/xxxx_create_product_category_table.php
-Schema::create('product_category', function (Blueprint $table) {
-    $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-    $table->foreignId('category_id')->constrained()->cascadeOnDelete();
-    $table->primary(['product_id', 'category_id']);
-});</code></pre>
-            </div>
+    use SoftDeletes;
+    protected $fillable = [\'user_id\', \'name\', \'slug\', \'is_active\'];
+}') ?></div>
         </div>
         
-        <!-- DatabaseSeeder -->
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">1.3.4 Appeler les seeders</h4>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">php</span>
-                <pre class="code-block"><code><span class="token-comment">// database/seeders/DatabaseSeeder.php</span>
+        <p class="mt-4 font-bold text-gray-800 mb-2">Modèle Category.php</p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP (app/Models/Category.php)</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('use Spatie\Translatable\HasTranslations;
 
-<span class="token-keyword">public function</span> <span class="token-function">run</span>(): <span class="token-keyword">void</span>
+class Category extends Model
 {
-    <span class="token-variable">$this</span>-><span class="token-function">call</span>([
-        CategorySeeder::<span class="token-keyword">class</span>,
-        ProductSeeder::<span class="token-keyword">class</span>,
+    use SoftDeletes, HasTranslations;
+    public array $translatable = [\'name\', \'description\'];
+    protected $fillable = [\'parent_id\', \'name\', \'slug\', \'is_active\'];
+    
+    public function children() { return $this->hasMany(Category::class, \'parent_id\'); }
+}') ?></div>
+        </div>
+    </div>
+</section>
+
+<!-- 1.5 Seeders -->
+<section id="seance1-seeders" class="mb-16 scroll-mt-20">
+    <div class="flex items-center mb-6">
+        <span class="badge-seance badge-seance-1 mr-3">Séance 1</span>
+        <h2 class="text-2xl font-bold text-gray-800">1.5 Jeu de Données (Seeder)</h2>
+    </div>
+
+    <div class="section-card">
+        <p class="mb-4">Créez des données réalistes pour tester la navigation.</p>
+        
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP (database/seeders/DatabaseSeeder.php)</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('public function run(): void
+{
+    // 1. Créer un Vendeur
+    $vendeur = \App\Models\User::factory()->create([
+        \'name\' => \'Vendeur Pro\',
+        \'email\' => \'vendeur@boutique.com\',
+        \'password\' => bcrypt(\'password\'),
     ]);
-}</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
+
+    // 2. Créer sa Boutique
+    $store = \App\Models\Store::create([
+        \'user_id\' => $vendeur->id,
+        \'name\' => \'TechMaster Digital\',
+        \'slug\' => \'techmaster-digital\',
+        \'is_active\' => true,
+        \'is_featured\' => true,
+        \'verified_at\' => now(),
+    ]);
+
+    // 3. Catégories
+    $cats = [];
+    $catNames = [\'Ebooks\', \'Formations\', \'Logiciels\', \'Templates\'];
+    foreach ($catNames as $name) {
+        $cats[$name] = \App\Models\Category::create([
+            \'name\' => [\'fr\' => $name, \'en\' => $name],
+            \'slug\' => \Illuminate\Support\Str::slug($name),
+            \'is_active\' => true
+        ]);
+    }
+
+    // 4. Produits Diversifiés
+    $productsData = [
+        [\'name\' => \'Guide Ultime Laravel 12\', \'cat\' => \'Ebooks\', \'price\' => 29.99],
+        [\'name\' => \'Maîtriser React JS\', \'cat\' => \'Ebooks\', \'price\' => 24.99],
+        [\'name\' => \'Formation Fullstack 2025\', \'cat\' => \'Formations\', \'price\' => 199.00],
+        [\'name\' => \'SaaS Starter Kit\', \'cat\' => \'Logiciels\', \'price\' => 89.00],
+        [\'name\' => \'Admin Dashboard Theme\', \'cat\' => \'Templates\', \'price\' => 49.00],
+        [\'name\' => \'Python pour Data Science\', \'cat\' => \'Formations\', \'price\' => 149.00],
+        [\'name\' => \'Figma UI Kit Pro\', \'cat\' => \'Templates\', \'price\' => 39.00],
+        [\'name\' => \'Docker pour Débutants\', \'cat\' => \'Ebooks\', \'price\' => 19.00],
+    ];
+
+    foreach ($productsData as $p) {
+        $product = \App\Models\Product::create([
+            \'store_id\' => $store->id,
+            \'name\' => [\'fr\' => $p[\'name\'], \'en\' => $p[\'name\']],
+            \'slug\' => \Illuminate\Support\Str::slug($p[\'name\']),
+            \'description\' => [\'fr\' => \'Description détaillée de \' . $p[\'name\'] . \'. Apprenez et progressez rapidement.\'],
+            \'price\' => $p[\'price\'],
+            \'type\' => \'digital\',
+            \'is_active\' => true,
+            \'published_at\' => now(),
+            \'views_count\' => rand(100, 5000),
+            \'sales_count\' => rand(10, 500)
+        ]);
+        
+        if (isset($cats[$p[\'cat\']])) {
+            $product->categories()->attach($cats[$p[\'cat\']]->id);
+        }
+    }
+}') ?></div>
         </div>
         
-        <!-- Exécuter les migrations -->
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">1.3.5 Exécuter les migrations et seeders</h4>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">bash</span>
-                <pre class="code-block"><code><span class="token-comment"># Exécuter les migrations et seeders</span>
-php artisan migrate:fresh --seed</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-            
-            <div class="alert-success mt-4">
-                <strong>✅ Vérification :</strong> Ouvrez votre base de données et vérifiez que les tables 
-                <code>categories</code> et <code>products</code> contiennent bien des données.
-            </div>
+        <div class="alert-success mt-4">
+            <p><strong>Action :</strong> <code>php artisan migrate:fresh --seed</code></p>
         </div>
-    </div>
-    
-    <div class="text-right mt-8">
-        <a href="#page-top" class="text-sm font-semibold text-blue-600 hover:underline">↑ Retour en haut</a>
     </div>
 </section>
 
-<!-- ========== 1.4 LAYOUT PUBLIC ========== -->
-<section id="seance1-layout" class="mb-16">
-    <h3 class="text-2xl font-semibold mb-3">1.4 Layout Public & Affichage du Catalogue</h3>
+<!-- 1.6 Routes -->
+<section id="seance1-routes" class="mb-16 scroll-mt-20">
+    <div class="flex items-center mb-6">
+        <span class="badge-seance badge-seance-1 mr-3">Séance 1</span>
+        <h2 class="text-2xl font-bold text-gray-800">1.6 Routes</h2>
+    </div>
+
+    <div class="section-card">
+        <p class="mb-2">Ajoutez ces routes dans <code>routes/web.php</code> pour gérer l'accueil, les catégories et les produits.</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP (routes/web.php)</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Models\Product;
+use App\Models\Category;
+use App\Models\Store;
+
+// 1. Accueil
+Route::get(\'/\', function () {
+    $products = Product::where(\'is_active\', true)
+        ->with([\'store\', \'categories\'])
+        ->orderBy(\'created_at\', \'desc\')
+        ->take(8)
+        ->get();
+        
+    $categories = Category::where(\'is_active\', true)->take(6)->get();
+    $featuredStores = Store::where(\'is_active\', true)->take(4)->get();
+
+    return view(\'welcome\', compact(\'products\', \'categories\', \'featuredStores\'));
+})->name(\'home\');
+
+// 2. Page Catégorie (Nouveau)
+Route::get(\'/category/{slug}\', function ($slug) {
+    $category = Category::where(\'slug\', $slug)->where(\'is_active\', true)->firstOrFail();
     
-    <div class="section-card space-y-8">
-        <!-- Installer Bootstrap -->
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">1.4.1 Créer le layout principal</h4>
-            <p class="text-gray-700 mb-4">
-                Créez le fichier de layout principal qui sera utilisé par toutes les pages publiques. 
-                Nous utilisons Bootstrap 5 via CDN pour simplifier.
-            </p>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">blade</span>
-                <pre class="code-block"><code><span class="token-comment">&lt;!-- resources/views/components/layouts/app.blade.php --&gt;</span>
+    $products = Product::where(\'is_active\', true)
+        ->whereHas(\'categories\', function($q) use ($category) {
+            $q->where(\'categories.id\', $category->id);
+        })
+        ->with([\'store\', \'categories\'])
+        ->paginate(12);
 
-&lt;!DOCTYPE html&gt;
-&lt;html lang="fr"&gt;
-&lt;head&gt;
-    &lt;meta charset="UTF-8"&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-    &lt;title&gt;<span class="token-blade">{{ $title ?? 'Boutique' }}</span>&lt;/title&gt;
+    return view(\'categories.show\', compact(\'category\', \'products\'));
+})->name(\'categories.show\');
+
+// 3. Fiche Produit (Nouveau)
+Route::get(\'/product/{slug}\', function ($slug) {
+    $product = Product::where(\'slug\', $slug)
+        ->where(\'is_active\', true)
+        ->with([\'store\', \'categories\'])
+        ->firstOrFail();
+        
+    $product->increment(\'views_count\');
     
-    <span class="token-comment">&lt;!-- Bootstrap 5 CSS --&gt;</span>
-    &lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"&gt;
-    <span class="token-comment">&lt;!-- Bootstrap Icons --&gt;</span>
-    &lt;link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    <span class="token-comment">&lt;!-- Navbar --&gt;</span>
-    &lt;nav class="navbar navbar-expand-lg navbar-dark bg-dark"&gt;
-        &lt;div class="container"&gt;
-            &lt;a class="navbar-brand" href="<span class="token-blade">{{ route('home') }}</span>"&gt;
-                &lt;i class="bi bi-shop me-2"&gt;&lt;/i&gt;Boutique
-            &lt;/a&gt;
-            &lt;ul class="navbar-nav ms-auto"&gt;
-                &lt;li class="nav-item"&gt;
-                    &lt;a class="nav-link" href="<span class="token-blade">{{ route('products.index') }}</span>"&gt;Produits&lt;/a&gt;
-                &lt;/li&gt;
-                &lt;li class="nav-item"&gt;
-                    &lt;a class="nav-link" href="#"&gt;
-                        &lt;i class="bi bi-cart"&gt;&lt;/i&gt; Panier
-                    &lt;/a&gt;
-                &lt;/li&gt;
-            &lt;/ul&gt;
-        &lt;/div&gt;
-    &lt;/nav&gt;
+    $relatedProducts = Product::where(\'is_active\', true)
+        ->where(\'id\', \'!=\', $product->id)
+        ->whereHas(\'categories\', function($q) use ($product) {
+            $q->whereIn(\'categories.id\', $product->categories->pluck(\'id\'));
+        })
+        ->take(4)
+        ->get();
 
-    <span class="token-comment">&lt;!-- Contenu principal --&gt;</span>
-    &lt;main&gt;
-        <span class="token-blade">{{ $slot }}</span>
-    &lt;/main&gt;
-
-    <span class="token-comment">&lt;!-- Footer --&gt;</span>
-    &lt;footer class="bg-dark text-white py-4 mt-5"&gt;
-        &lt;div class="container text-center"&gt;
-            &lt;p class="mb-0"&gt;&amp;copy; 2025 Boutique. Tous droits réservés.&lt;/p&gt;
-        &lt;/div&gt;
-    &lt;/footer&gt;
-
-    <span class="token-comment">&lt;!-- Bootstrap JS --&gt;</span>
-    &lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
+    return view(\'products.show\', compact(\'product\', \'relatedProducts\'));
+})->name(\'products.show\');
+') ?></div>
         </div>
-        
-        <!-- ProductController -->
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">1.4.2 Créer le ProductController</h4>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">bash</span>
-                <pre class="code-block"><code>php artisan make:controller ProductController</code></pre>
-                <button class="copy-btn">Copier</button>
+    </div>
+</section>
+
+<!-- 1.7 Vues -->
+<section id="seance1-views" class="mb-16 scroll-mt-20">
+    <div class="flex items-center mb-6">
+        <span class="badge-seance badge-seance-1 mr-3">Séance 1</span>
+        <h2 class="text-2xl font-bold text-gray-800">1.7 Composants et Vues</h2>
+    </div>
+
+    <div class="section-card">
+        <p class="mb-4">Nous allons créer le layout et les vues pour la navigation.</p>
+
+        <!-- A. Product Card -->
+        <h4 class="font-bold text-gray-800 mb-2 mt-4 decoration-clone text-blue-600">A. Composant Product Card</h4>
+        <p class="text-xs text-gray-500 mb-2">Fichier: <code>resources/views/components/product-card.blade.php</code></p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">HTML</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('@props([\'product\'])
+<div class="col-md-6 col-lg-3">
+    <div class="card h-100 shadow-sm border-0 product-card">
+        <a href="{{ route(\'products.show\', $product->slug) }}">
+            <img src="{{ $product->thumbnail_url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ $product->name }}">
+        </a>
+        <div class="card-body">
+            <div class="text-muted small mb-2">
+                @foreach($product->categories as $cat)
+                    <span class="badge bg-light text-secondary">{{ $cat->name }}</span>
+                @endforeach
             </div>
-            
-            <div class="code-block-wrapper mt-4">
-                <span class="code-lang">php</span>
-                <pre class="code-block"><code><span class="token-comment">// app/Http/Controllers/ProductController.php</span>
-
-<span class="token-preprocessor">&lt;?php</span>
-
-<span class="token-keyword">namespace</span> <span class="token-namespace">App\Http\Controllers</span>;
-
-<span class="token-keyword">use</span> <span class="token-class-name">App\Models\Product</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">App\Models\Category</span>;
-<span class="token-keyword">use</span> <span class="token-class-name">Illuminate\Http\Request</span>;
-
-<span class="token-keyword">class</span> <span class="token-class-name">ProductController</span> <span class="token-keyword">extends</span> <span class="token-class-name">Controller</span>
-{
-    <span class="token-comment">// Liste des produits</span>
-    <span class="token-keyword">public function</span> <span class="token-function">index</span>(Request <span class="token-variable">$request</span>)
-    {
-        <span class="token-variable">$query</span> = Product::<span class="token-function">with</span>(<span class="token-string">'categories'</span>)
-            -><span class="token-function">where</span>(<span class="token-string">'is_active'</span>, <span class="token-keyword">true</span>);
-
-        <span class="token-comment">// Filtrer par catégorie si demandé (relation Many-to-Many)</span>
-        <span class="token-keyword">if</span> (<span class="token-variable">$request</span>-><span class="token-function">has</span>(<span class="token-string">'category'</span>)) {
-            <span class="token-variable">$query</span>-><span class="token-function">whereHas</span>(<span class="token-string">'categories'</span>, <span class="token-function">fn</span>(<span class="token-variable">$q</span>) => <span class="token-variable">$q</span>-><span class="token-function">where</span>(<span class="token-string">'categories.id'</span>, <span class="token-variable">$request</span>->category));
-        }
-
-        <span class="token-variable">$products</span> = <span class="token-variable">$query</span>-><span class="token-function">paginate</span>(<span class="token-number">12</span>);
-        <span class="token-variable">$categories</span> = Category::<span class="token-function">where</span>(<span class="token-string">'is_active'</span>, <span class="token-keyword">true</span>)-><span class="token-function">get</span>();
-
-        <span class="token-keyword">return</span> <span class="token-function">view</span>(<span class="token-string">'products.index'</span>, <span class="token-function">compact</span>(<span class="token-string">'products'</span>, <span class="token-string">'categories'</span>));
-    }
-
-    <span class="token-comment">// Détail d'un produit</span>
-    <span class="token-keyword">public function</span> <span class="token-function">show</span>(Product <span class="token-variable">$product</span>)
-    {
-        <span class="token-keyword">return</span> <span class="token-function">view</span>(<span class="token-string">'products.show'</span>, <span class="token-function">compact</span>(<span class="token-string">'product'</span>));
-    }
-}</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-        </div>
-        
-        <!-- Routes -->
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">1.4.3 Définir les routes</h4>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">php</span>
-                <pre class="code-block"><code><span class="token-comment">// routes/web.php</span>
-
-<span class="token-keyword">use</span> <span class="token-class-name">App\Http\Controllers\ProductController</span>;
-
-Route::<span class="token-function">get</span>(<span class="token-string">'/'</span>, <span class="token-keyword">fn</span>() => <span class="token-function">view</span>(<span class="token-string">'home'</span>))-><span class="token-function">name</span>(<span class="token-string">'home'</span>);
-
-Route::<span class="token-function">get</span>(<span class="token-string">'/products'</span>, [ProductController::<span class="token-keyword">class</span>, <span class="token-string">'index'</span>])-><span class="token-function">name</span>(<span class="token-string">'products.index'</span>);
-Route::<span class="token-function">get</span>(<span class="token-string">'/products/{product:slug}'</span>, [ProductController::<span class="token-keyword">class</span>, <span class="token-string">'show'</span>])-><span class="token-function">name</span>(<span class="token-string">'products.show'</span>);</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-        </div>
-        
-        <!-- Vue products/index -->
-        <div>
-            <h4 class="text-lg font-semibold text-gray-900 mb-2">1.4.4 Vue du catalogue</h4>
-            
-            <div class="code-block-wrapper">
-                <span class="code-lang">blade</span>
-                <pre class="code-block"><code><span class="token-comment">&lt;!-- resources/views/products/index.blade.php --&gt;</span>
-
-&lt;x-layouts.app title="Nos Produits"&gt;
-    &lt;div class="container py-5"&gt;
-        &lt;h1 class="mb-4"&gt;Nos Produits&lt;/h1&gt;
-        
-        <span class="token-comment">&lt;!-- Filtres par catégorie --&gt;</span>
-        &lt;div class="mb-4"&gt;
-            &lt;a href="<span class="token-blade">{{ route('products.index') }}</span>" 
-               class="btn btn-sm <span class="token-blade">{{ !request('category') ? 'btn-primary' : 'btn-outline-primary' }}</span>"&gt;
-                Tous
-            &lt;/a&gt;
-            <span class="token-blade">@foreach($categories as $category)</span>
-            &lt;a href="<span class="token-blade">{{ route('products.index', ['category' => $category->id]) }}</span>" 
-               class="btn btn-sm <span class="token-blade">{{ request('category') == $category->id ? 'btn-primary' : 'btn-outline-primary' }}</span>"&gt;
-                <span class="token-blade">{{ $category->name }}</span>
-            &lt;/a&gt;
-            <span class="token-blade">@endforeach</span>
-        &lt;/div&gt;
-
-        <span class="token-comment">&lt;!-- Grille de produits --&gt;</span>
-        &lt;div class="row g-4"&gt;
-            <span class="token-blade">@forelse($products as $product)</span>
-            &lt;div class="col-md-4 col-lg-3"&gt;
-                &lt;div class="card h-100 shadow-sm"&gt;
-                    &lt;img src="<span class="token-blade">{{ $product->thumbnail_url }}</span>" 
-                         class="card-img-top" 
-                         alt="<span class="token-blade">{{ $product->name }}</span>"
-                         style="height: 180px; object-fit: cover;"&gt;
-                    &lt;div class="card-body d-flex flex-column"&gt;
-                        &lt;span class="badge bg-secondary mb-2"&gt;<span class="token-blade">{{ $product->categories->first()?->name ?? 'Sans catégorie' }}</span>&lt;/span&gt;
-                        &lt;h5 class="card-title"&gt;<span class="token-blade">{{ $product->name }}</span>&lt;/h5&gt;
-                        &lt;p class="text-primary fw-bold"&gt;<span class="token-blade">{{ number_format($product->price, 2) }}</span> €&lt;/p&gt;
-                        &lt;a href="<span class="token-blade">{{ route('products.show', $product) }}</span>" class="btn btn-outline-primary mt-auto"&gt;
-                            Voir détails
-                        &lt;/a&gt;
-                    &lt;/div&gt;
-                &lt;/div&gt;
-            &lt;/div&gt;
-            <span class="token-blade">@empty</span>
-            &lt;div class="col-12"&gt;
-                &lt;p class="text-muted text-center"&gt;Aucun produit disponible.&lt;/p&gt;
-            &lt;/div&gt;
-            <span class="token-blade">@endforelse</span>
-        &lt;/div&gt;
-
-        <span class="token-comment">&lt;!-- Pagination --&gt;</span>
-        &lt;div class="mt-4"&gt;
-            <span class="token-blade">{{ $products->links() }}</span>
-        &lt;/div&gt;
-    &lt;/div&gt;
-&lt;/x-layouts.app&gt;</code></pre>
-                <button class="copy-btn">Copier</button>
+            <h5 class="card-title h6">
+                <a href="{{ route(\'products.show\', $product->slug) }}" class="text-dark text-decoration-none stretched-link">
+                    {{ $product->name }}
+                </a>
+            </h5>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <span class="text-primary fw-bold fs-5">{{ $product->formatted_price }}</span>
+                <button class="btn btn-sm btn-outline-primary"><i class="bi bi-cart-plus"></i></button>
             </div>
         </div>
     </div>
-    
-    <!-- Exercice -->
-    <div class="mt-8 p-6 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
-        <h4 class="text-xl font-bold text-gray-800 mb-2">📝 Exercice : Créer la page d'accueil</h4>
-        <p class="text-gray-700 mb-4">
-            Créez une page d'accueil (<code>resources/views/home.blade.php</code>) qui affiche :
-        </p>
-        <ol class="list-decimal ml-6 text-gray-700 space-y-2">
-            <li>Un hero banner de bienvenue</li>
-            <li>Les 4 derniers produits ajoutés</li>
-            <li>Les catégories sous forme de cartes</li>
-        </ol>
-        
-        <button class="solution-toggle">👁️ Voir la solution</button>
-        <div class="solution-content">
-            <!-- Étape 1: HomeController -->
-            <h5 class="font-bold text-gray-800 mt-6 mb-2">Étape 1 : Créer le HomeController</h5>
-            <div class="code-block-wrapper">
-                <span class="code-lang">bash</span>
-                <pre class="code-block"><code>php artisan make:controller HomeController</code></pre>
-                <button class="copy-btn">Copier</button>
+</div>') ?></div>
+        </div>
+
+        <!-- B. Header -->
+        <h4 class="font-bold text-gray-800 mb-2 mt-8 decoration-clone text-blue-600">B. Composant Header</h4>
+        <p class="text-xs text-gray-500 mb-2">Fichier: <code>resources/views/components/header.blade.php</code></p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">HTML</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<header class="bg-dark text-white py-2">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-3 text-center text-md-start mb-2 mb-md-0">
+                <a href="{{ url(\'/\') }}" class="text-decoration-none text-white d-inline-flex align-items-center">
+                    <span class="fs-4 fw-bold">Boutique</span>
+                </a>
             </div>
-            
-            <div class="code-block-wrapper mt-4">
-                <span class="code-lang">php</span>
-                <pre class="code-block"><code><span class="token-comment">// app/Http/Controllers/HomeController.php</span>
-
-<span class="token-preprocessor">&lt;?php</span>
-
-<span class="token-keyword">namespace</span> App\Http\Controllers;
-
-<span class="token-keyword">use</span> App\Models\Product;
-<span class="token-keyword">use</span> App\Models\Category;
-
-<span class="token-keyword">class</span> <span class="token-class-name">HomeController</span> <span class="token-keyword">extends</span> Controller
-{
-    <span class="token-keyword">public function</span> <span class="token-function">index</span>()
-    {
-        <span class="token-comment">// Récupérer les 4 derniers produits</span>
-        <span class="token-variable">$latestProducts</span> = Product::<span class="token-function">with</span>(<span class="token-string">'categories'</span>)
-            -><span class="token-function">where</span>(<span class="token-string">'is_active'</span>, <span class="token-keyword">true</span>)
-            -><span class="token-function">latest</span>()
-            -><span class="token-function">take</span>(<span class="token-number">4</span>)
-            -><span class="token-function">get</span>();
-        
-        <span class="token-comment">// Récupérer les catégories avec le nombre de produits</span>
-        <span class="token-variable">$categories</span> = Category::<span class="token-function">withCount</span>(<span class="token-string">'products'</span>)
-            -><span class="token-function">where</span>(<span class="token-string">'is_active'</span>, <span class="token-keyword">true</span>)
-            -><span class="token-function">get</span>();
-        
-        <span class="token-keyword">return</span> <span class="token-function">view</span>(<span class="token-string">'home'</span>, <span class="token-function">compact</span>(<span class="token-string">'latestProducts'</span>, <span class="token-string">'categories'</span>));
-    }
-}</code></pre>
-                <button class="copy-btn">Copier</button>
+            <div class="col-12 col-md-6 mb-2 mb-md-0">
+                <form action="{{ url(\'/search\') }}" method="GET" class="d-flex">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" placeholder="Rechercher..." value="{{ request(\'q\') }}">
+                        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
+                    </div>
+                </form>
             </div>
-            
-            <!-- Étape 2: Route -->
-            <h5 class="font-bold text-gray-800 mt-6 mb-2">Étape 2 : Modifier la route</h5>
-            <div class="code-block-wrapper">
-                <span class="code-lang">php</span>
-                <pre class="code-block"><code><span class="token-comment">// routes/web.php</span>
-
-<span class="token-keyword">use</span> App\Http\Controllers\HomeController;
-
-Route::<span class="token-function">get</span>(<span class="token-string">'/'</span>, [HomeController::<span class="token-keyword">class</span>, <span class="token-string">'index'</span>])-><span class="token-function">name</span>(<span class="token-string">'home'</span>);</code></pre>
-                <button class="copy-btn">Copier</button>
-            </div>
-            
-            <!-- Étape 3: Vue -->
-            <h5 class="font-bold text-gray-800 mt-6 mb-2">Étape 3 : Créer la vue home.blade.php</h5>
-            <div class="code-block-wrapper">
-                <span class="code-lang">blade</span>
-                <pre class="code-block"><code><span class="token-comment">&lt;!-- resources/views/home.blade.php --&gt;</span>
-
-&lt;x-layouts.app title="Accueil - Boutique"&gt;
-    <span class="token-comment">&lt;!-- Hero Banner --&gt;</span>
-    &lt;div class="bg-primary text-white py-5"&gt;
-        &lt;div class="container text-center"&gt;
-            &lt;h1 class="display-4 fw-bold"&gt;Bienvenue sur notre Marketplace&lt;/h1&gt;
-            &lt;p class="lead"&gt;Découvrez nos produits numériques de qualité&lt;/p&gt;
-            &lt;a href="<span class="token-blade">{{ route('products.index') }}</span>" class="btn btn-light btn-lg mt-3"&gt;
-                Voir tous les produits
-            &lt;/a&gt;
-        &lt;/div&gt;
-    &lt;/div&gt;
-
-    &lt;div class="container py-5"&gt;
-        <span class="token-comment">&lt;!-- Derniers Produits --&gt;</span>
-        &lt;section class="mb-5"&gt;
-            &lt;h2 class="h3 mb-4"&gt;Nouveautés&lt;/h2&gt;
-            &lt;div class="row g-4"&gt;
-                <span class="token-blade">@foreach($latestProducts as $product)</span>
-                &lt;div class="col-md-3"&gt;
-                    &lt;div class="card h-100 shadow-sm"&gt;
-                        &lt;img src="<span class="token-blade">{{ $product-&gt;thumbnail_url }}</span>" 
-                             class="card-img-top" style="height: 150px; object-fit: cover;"&gt;
-                        &lt;div class="card-body"&gt;
-                            &lt;span class="badge bg-secondary"&gt;<span class="token-blade">{{ $product-&gt;categories-&gt;first()?-&gt;name ?? 'Sans catégorie' }}</span>&lt;/span&gt;
-                            &lt;h5 class="card-title mt-2"&gt;<span class="token-blade">{{ $product-&gt;name }}</span>&lt;/h5&gt;
-                            &lt;p class="text-primary fw-bold"&gt;<span class="token-blade">{{ number_format($product-&gt;price, 2) }}</span> €&lt;/p&gt;
-                            &lt;a href="<span class="token-blade">{{ route('products.show', $product) }}</span>" class="btn btn-outline-primary btn-sm"&gt;
-                                Voir
-                            &lt;/a&gt;
-                        &lt;/div&gt;
-                    &lt;/div&gt;
-                &lt;/div&gt;
-                <span class="token-blade">@endforeach</span>
-            &lt;/div&gt;
-        &lt;/section&gt;
-
-        <span class="token-comment">&lt;!-- Catégories --&gt;</span>
-        &lt;section&gt;
-            &lt;h2 class="h3 mb-4"&gt;Nos Catégories&lt;/h2&gt;
-            &lt;div class="row g-4"&gt;
-                <span class="token-blade">@foreach($categories as $category)</span>
-                &lt;div class="col-md-4"&gt;
-                    &lt;a href="<span class="token-blade">{{ route('products.index', ['category' =&gt; $category-&gt;id]) }}</span>" 
-                       class="text-decoration-none"&gt;
-                        &lt;div class="card bg-light"&gt;
-                            &lt;div class="card-body text-center"&gt;
-                                &lt;i class="bi <span class="token-blade">{{ $category-&gt;icon }}</span> fs-1 text-primary"&gt;&lt;/i&gt;
-                                &lt;h5 class="mt-2"&gt;<span class="token-blade">{{ $category-&gt;name }}</span>&lt;/h5&gt;
-                                &lt;small class="text-muted"&gt;<span class="token-blade">{{ $category-&gt;products_count }}</span> produits&lt;/small&gt;
-                            &lt;/div&gt;
-                        &lt;/div&gt;
-                    &lt;/a&gt;
-                &lt;/div&gt;
-                <span class="token-blade">@endforeach</span>
-            &lt;/div&gt;
-        &lt;/section&gt;
-    &lt;/div&gt;
-&lt;/x-layouts.app&gt;</code></pre>
-                <button class="copy-btn">Copier</button>
+            <div class="col-12 col-md-3 text-end">
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="#" class="btn btn-outline-light btn-sm"><i class="bi bi-cart3"></i></a>
+                    <a href="#" class="btn btn-outline-light btn-sm"><i class="bi bi-person-circle"></i></a>
+                </div>
             </div>
         </div>
     </div>
-    
-    <div class="alert-success mt-8">
-        <strong>🎉 Fin de la Séance 1 !</strong> Vous avez maintenant un catalogue de produits fonctionnel. 
-        Dans la prochaine séance, nous ajouterons l'authentification et les rôles utilisateurs.
+</header>') ?></div>
+        </div>
+
+        <!-- C. Navbar -->
+        <h4 class="font-bold text-gray-800 mb-2 mt-8 decoration-clone text-blue-600">C. Composant Navbar</h4>
+        <p class="text-xs text-gray-500 mb-2">Fichier: <code>resources/views/components/main-navbar.blade.php</code></p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">HTML</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link active" href="{{ url(\'/\') }}">Accueil</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Catégories</a></li>
+                <li class="nav-item"><a class="nav-link text-danger" href="#">Promos</a></li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-primary fw-bold" href="#">Devenir vendeur</a>
+                </li>
+            </ul>
+        </div>
     </div>
-    
-    <div class="text-right mt-8">
-        <a href="#page-top" class="text-sm font-semibold text-blue-600 hover:underline">↑ Retour en haut</a>
+</nav>') ?></div>
+        </div>
+
+        <!-- D. Footer -->
+        <h4 class="font-bold text-gray-800 mb-2 mt-8 decoration-clone text-blue-600">D. Composant Footer</h4>
+        <p class="text-xs text-gray-500 mb-2">Fichier: <code>resources/views/components/footer.blade.php</code></p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">HTML</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<footer class="bg-dark text-white mt-auto py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <h5>Boutique</h5>
+                <p class="text-secondary small">La meilleure marketplace pour vos produits numériques.</p>
+            </div>
+            <div class="col-md-4">
+                <h6>Liens rapides</h6>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-secondary text-decoration-none">Accueil</a></li>
+                    <li><a href="#" class="text-secondary text-decoration-none">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h6>Newsletter</h6>
+                <form class="mt-2">
+                    <div class="input-group">
+                        <input type="email" class="form-control" placeholder="Email...">
+                        <button class="btn btn-primary">Ok</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="border-top border-secondary mt-4 pt-3 text-center text-secondary small">
+            &copy; {{ date(\'Y\') }} Boutique. Tous droits réservés.
+        </div>
+    </div>
+</footer>') ?></div>
+        </div>
+
+        <!-- E. Layout -->
+        <h4 class="font-bold text-gray-800 mb-2 mt-8 decoration-clone text-blue-600">E. Layout Principal</h4>
+        <p class="text-xs text-gray-500 mb-2">Fichier: <code>resources/views/components/layouts/app.blade.php</code></p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">HTML</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<!DOCTYPE html>
+<html lang="{{ str_replace(\'_\', \'-\', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ $title ?? \'Boutique\' }}</title>
+    @vite([\'resources/css/app.css\', \'resources/js/app.js\'])
+</head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+    <x-header />
+    <x-main-navbar />
+    <main class="flex-grow-1">
+        {{ $slot }}
+    </main>
+    <x-footer />
+</body>
+</html>') ?></div>
+        </div>
+
+        <!-- F. Welcome -->
+        <h4 class="font-bold text-gray-800 mb-2 mt-8 decoration-clone text-blue-600">F. Page d'Accueil (Welcome)</h4>
+        <p class="text-xs text-gray-500 mb-2">Fichier: <code>resources/views/welcome.blade.php</code></p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">HTML</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<x-layouts.app title="Accueil">
+    <section class="bg-primary text-white py-5 mb-5 rounded-3 mt-4">
+        <div class="container py-4">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <h1 class="display-4 fw-bold mb-3">Produits Numériques Premium</h1>
+                    <p class="lead mb-4">Ebooks, Formations, Logiciels. Une qualité garantie.</p>
+                    <a href="#catalogue" class="btn btn-light btn-lg text-primary fw-bold">Voir le catalogue</a>
+                </div>
+                <div class="col-lg-5 text-center d-none d-lg-block">
+                     <img src="https://loremflickr.com/500/350/technology,computer" class="img-fluid rounded shadow-lg" alt="Hero">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container mb-5">
+        <h2 class="h4 mb-4 fw-bold border-start border-4 border-primary ps-3">Catégories</h2>
+        <div class="row g-3">
+            @foreach($categories as $category)
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{{ route(\'categories.show\', $category->slug) }}" class="text-decoration-none">
+                    <div class="card text-center h-100 border-0 shadow-sm hover-shadow">
+                        <div class="card-body">
+                            <div class="fs-2 mb-2">📁</div>
+                            <h6 class="card-title text-dark mb-0">{{ $category->name }}</h6>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            @endforeach
+        </div>
+    </section>
+
+    <section id="catalogue" class="container mb-5">
+        <h2 class="h4 fw-bold border-start border-4 border-primary ps-3 mb-4">Nouveautés</h2>
+        <div class="row g-4">
+            @foreach($products as $product)
+                <x-product-card :product="$product" />
+            @endforeach
+        </div>
+    </section>
+</x-layouts.app>') ?></div>
+        </div>
+
+        <!-- G. Category Show -->
+        <h4 class="font-bold text-gray-800 mb-2 mt-8 decoration-clone text-blue-600">G. Page Catégorie (Nouveau)</h4>
+        <p class="text-xs text-gray-500 mb-2">Fichier: <code>resources/views/categories/show.blade.php</code></p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">HTML</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<x-layouts.app :title="$category->name">
+    <div class="bg-light py-4 mb-4">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{{ route(\'home\') }}">Accueil</a></li>
+                    <li class="breadcrumb-item active">{{ $category->name }}</li>
+                </ol>
+            </nav>
+            <h1 class="h2 fw-bold">{{ $category->name }}</h1>
+        </div>
+    </div>
+    <div class="container mb-5">
+        <div class="row g-4">
+            @forelse($products as $product)
+                <x-product-card :product="$product" />
+            @empty
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted">Aucun produit dans cette catégorie.</p>
+                </div>
+            @endforelse
+        </div>
+        <div class="mt-4">{{ $products->links() }}</div>
+    </div>
+</x-layouts.app>') ?></div>
+        </div>
+
+        <!-- H. Product Show -->
+        <h4 class="font-bold text-gray-800 mb-2 mt-8 decoration-clone text-blue-600">H. Fiche Produit (Nouveau)</h4>
+        <p class="text-xs text-gray-500 mb-2">Fichier: <code>resources/views/products/show.blade.php</code></p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">HTML</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<x-layouts.app :title="$product->name">
+    <div class="container py-5">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ route(\'home\') }}">Accueil</a></li>
+                @if($product->categories->isNotEmpty())
+                    <li class="breadcrumb-item">
+                        <a href="{{ route(\'categories.show\', $product->categories->first()->slug) }}">
+                            {{ $product->categories->first()->name }}
+                        </a>
+                    </li>
+                @endif
+                <li class="breadcrumb-item active">{{ $product->name }}</li>
+            </ol>
+        </nav>
+
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm overflow-hidden rounded-3">
+                    <img src="{{ $product->thumbnail_url }}" class="img-fluid w-100" alt="{{ $product->name }}">
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="ps-lg-4">
+                    <h1 class="display-6 fw-bold mb-3">{{ $product->name }}</h1>
+                    <h2 class="h3 text-primary fw-bold mb-4">{{ $product->formatted_price }}</h2>
+                    <div class="prose text-muted mb-4">{{ $product->description }}</div>
+                    
+                    <div class="d-grid gap-2 d-md-flex mb-4">
+                        <button class="btn btn-primary btn-lg flex-grow-1">
+                            <i class="bi bi-cart-plus me-2"></i>Ajouter au panier
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        @if($relatedProducts->isNotEmpty())
+        <div class="mt-5 pt-5 border-top">
+            <h3 class="h4 fw-bold mb-4">Produits similaires</h3>
+            <div class="row g-4">
+                @foreach($relatedProducts as $related)
+                    <x-product-card :product="$related" />
+                @endforeach
+            </div>
+        </div>
+        @endif
+    </div>
+</x-layouts.app>') ?></div>
+        </div>
     </div>
 </section>
