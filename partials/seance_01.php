@@ -53,7 +53,15 @@ cd boutique</div>
         <div class="code-block-wrapper">
             <div class="code-lang">TERMINAL</div>
             <button class="copy-btn">Copier</button>
-            <div class="code-block">composer require spatie/laravel-translatable
+            <div class="code-block">composer require spatie/laravel-medialibrary
+php artisan vendor:publish --provider="Spatie\MediaLibrary\MediaLibraryServiceProvider" --tag="migrations"
+php artisan migrate
+
+composer require spatie/laravel-activitylog
+php artisan vendor:publish --provider="Spatie\Activitylog\ActivitylogServiceProvider" --tag="activitylog-migrations"
+php artisan migrate
+
+composer require spatie/laravel-translatable
 npm install bootstrap @popperjs/core sass bootstrap-icons</div>
         </div>
 

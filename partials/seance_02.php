@@ -281,6 +281,77 @@ php artisan migrate</div>
     </div>
 </section>
 
+<!-- 2.4a Modification Table Users -->
+<section id="seance2-users-migration" class="mb-16 scroll-mt-20">
+    <div class="flex items-center mb-6">
+        <span class="badge-seance badge-seance-2 mr-3">Séance 2</span>
+        <h2 class="text-2xl font-bold text-gray-800">2.4a Modification de la table Users</h2>
+    </div>
+
+    <div class="section-card">
+        <p class="mb-4">
+            Nous devons ajouter le champ <code>is_vendor</code> et <code>vendor_verified_at</code> à la table users.
+        </p>
+
+        <div class="code-block-wrapper">
+            <div class="code-lang">TERMINAL</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">php artisan make:migration add_vendor_fields_to_users_table --table=users</div>
+        </div>
+
+        <p class="mb-2 mt-4">Dans la nouvelle migration créée (<code>database/migrations/xxxx_xx_xx_xxxxxx_add_vendor_fields_to_users_table.php</code>) :</p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('public function up(): void
+{
+    Schema::table(\'users\', function (Blueprint $table) {
+        $table->boolean(\'is_vendor\')->default(false)->after(\'email\');
+        $table->timestamp(\'vendor_verified_at\')->nullable()->after(\'is_vendor\');
+    });
+}
+
+public function down(): void
+{
+    Schema::table(\'users\', function (Blueprint $table) {
+        $table->dropColumn([\'is_vendor\', \'vendor_verified_at\']);
+    });
+}') ?></div>
+        </div>
+
+        <div class="code-block-wrapper mt-4">
+            <div class="code-lang">TERMINAL</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">php artisan migrate</div>
+        </div>
+    </div>
+</section>
+
+<!-- 2.4b Configuration Middleware -->
+<section id="seance2-middleware" class="mb-16 scroll-mt-20">
+    <div class="section-card border-l-4 border-blue-500 bg-blue-50">
+        <h3 class="text-xl font-bold text-blue-800 mb-4">ℹ️ Configuration des Middlewares</h3>
+        <p class="text-blue-800 mb-4">
+            Pour utiliser <code>role:admin</code> dans vos routes, vous devez enregistrer les middlewares de Spatie.
+        </p>
+        <p class="mb-2">Ouvrez <code>bootstrap/app.php</code> et ajoutez les alias dans <code>withMiddleware</code> :</p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars(<<<'PHP'
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+        ]);
+    })
+PHP
+) ?></div>
+        </div>
+    </div>
+</section>
+
 <!-- 2.5 Modèle User -->
 <section id="seance2-user-model" class="mb-16 scroll-mt-20">
     <div class="flex items-center mb-6">

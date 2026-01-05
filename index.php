@@ -16,9 +16,9 @@ require_once './layout/header.php';
 
 require_once './partials/seance_01.php'; // Fondations & Catalogue
 require_once './partials/seance_02.php'; // Auth & Rôles
-/*
 require_once './partials/seance_03.php';
 require_once './partials/seance_04.php';
+/*
 require_once './partials/seance_05.php';
 require_once './partials/seance_06.php';
 require_once './partials/seance_07.php';
