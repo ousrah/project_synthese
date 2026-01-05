@@ -117,7 +117,8 @@ body {
         <div class="code-block-wrapper">
             <div class="code-lang">PHP</div>
             <button class="copy-btn">Copier</button>
-            <div class="code-block"><?= htmlspecialchars("<?php
+            <div class="code-block"><?= htmlspecialchars(<<<'PHP'
+<?php
 
 use Illuminate\Support\Facades\Route;
 use App\Models\Product;
@@ -144,8 +145,8 @@ Route::get('/category/{slug}', function ($slug) {
     $category = Category::where('slug', $slug)->where('is_active', true)->firstOrFail();
     
     $products = Product::where('is_active', true)
-        ->whereHas('categories', function(\$q) use (\$category) {
-            \$q->where('categories.id', \$category->id);
+        ->whereHas('categories', function($q) use ($category) {
+            $q->where('categories.id', $category->id);
         })
         ->with(['store', 'categories'])
         ->paginate(12);
@@ -162,9 +163,9 @@ Route::get('/product/{slug}', function ($slug) {
     $product->increment('views_count');
     
     $relatedProducts = Product::where('is_active', true)
-        ->where('id', '!=', \$product->id)
-        ->whereHas('categories', function(\$q) use (\$product) {
-            \$q->whereIn('categories.id', \$product->categories->pluck('id'));
+        ->where('id', '!=', $product->id)
+        ->whereHas('categories', function($q) use ($product) {
+            $q->whereIn('categories.id', $product->categories->pluck('id'));
         })
         ->take(4)
         ->get();
@@ -184,7 +185,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';") ?></div>
+require __DIR__.'/auth.php';
+PHP
+) ?></div>
         </div>
     </div>
 </section>
