@@ -60,7 +60,8 @@ $course_parts = [
         ['id' => 'seance4-result', 'title' => "✅ Résultat : CRUD catégories avec images"],
     ],
     "Séance 5 : Gestion Produits & Galerie Photos" => [
-        ['id' => 'seance5-product-media', 'title' => "5.1 Product avec Spatie Media (Collections)"],
+        ['id' => 'seance5-intro', 'title' => "5.1 Configuration Multi-langues (Prérequis)"],
+        ['id' => 'seance5-product-media', 'title' => "5.2 Modèle Product avec Spatie Media"],
         ['id' => 'seance5-routes', 'title' => "5.2 Routes Vendor/Products"],
         ['id' => 'seance5-controller', 'title' => "5.3 ProductController Vendor (CRUD)"],
         ['id' => 'seance5-forms', 'title' => "5.4 Formulaires : Create/Edit Product"],
