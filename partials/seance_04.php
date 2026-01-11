@@ -155,16 +155,16 @@ class CategoryController extends Controller
             \'parent_id\' => \'nullable|exists:categories,id\',
             \'description\' => \'nullable|string\',
             \'image\' => \'nullable|image|max:2048\', // 2Mo max
-            \'is_active\' => \'boolean\',
+            //   \'is_active\' => \'nullable|boolean\',
         ]);
 
         // Création avec traduction basique (FR par défaut)
         // Pour un vrai multi-langue, on demanderait un tableau
         $category = Category::create([
-            \'name\' => [\'fr\' => $validated[\'name\']],
-            \'description\' => [\'fr\' => $validated[\'description\'] ?? null],
-            \'parent_id\' => $validated[\'parent_id\'],
-            \'slug\' => Str::slug($validated[\'name\']),
+            \'name\' => [\'fr\' => $request[\'name\']],
+            \'description\' => [\'fr\' => $request[\'description\'] ?? null],
+            \'parent_id\' => $request[\'parent_id\'],
+            \'slug\' => Str::slug($request[\'name\']),
             \'is_active\' => $request->has(\'is_active\'),
         ]);
 
@@ -187,7 +187,9 @@ class CategoryController extends Controller
         $validated = $request->validate([
             \'name\' => \'required|string|max:255\',
             \'parent_id\' => \'nullable|exists:categories,id\',
+            \'description\' => \'nullable|string\',
             \'image\' => \'nullable|image|max:2048\',
+            //   \'is_active\' => \'nullable|boolean\',
         ]);
 
         $category->update([
@@ -373,27 +375,39 @@ Route::middleware([\'auth\', \'role:admin\'])->prefix(\'admin\')->name(\'admin.\
                     
                     <div class="mb-3">
                         <label class="form-label">Nom <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control" required>
+                        <input type="text" name="name" class="form-control @error(\'name\') is-invalid @enderror" required value="{{ old(\'name\') }}">
+                        @error(\'name\')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Catégorie Parente</label>
-                        <select name="parent_id" class="form-select">
+                        <select name="parent_id" class="form-select @error(\'parent_id\') is-invalid @enderror">
                             <option value="">Aucune (Catégorie principale)</option>
                             @foreach($parents as $parent)
-                                <option value="{{ $parent->id }}">{{ $parent->name }}</option>
+                                <option value="{{ $parent->id }}" {{ old(\'parent_id\') == $parent->id ? \'selected\' : \'\' }}>{{ $parent->name }}</option>
                             @endforeach
                         </select>
+                        @error(\'parent_id\')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     
                     <div class="mb-3">
                         <label class="form-label">Description</label>
-                        <textarea name="description" class="form-control" rows="3"></textarea>
+                        <textarea name="description" class="form-control @error(\'description\') is-invalid @enderror" rows="3">{{ old(\'description\') }}</textarea>
+                        @error(\'description\')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Image</label>
-                        <input type="file" name="image" class="form-control" accept="image/*">
+                        <input type="file" name="image" class="form-control @error(\'image\') is-invalid @enderror" accept="image/*">
+                        @error(\'image\')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="mb-3 form-check form-switch">
@@ -475,7 +489,37 @@ Route::middleware([\'auth\', \'role:admin\'])->prefix(\'admin\')->name(\'admin.\
     </div>
 </section>
 
-<!-- 4.6 Verification -->
+<!-- 4.6 Navigation -->
+<section id="seance4-nav" class="mb-16 scroll-mt-20">
+    <div class="flex items-center mb-6">
+        <span class="badge-seance badge-seance-4 mr-3">Séance 4</span>
+        <h2 class="text-2xl font-bold text-gray-800">4.6 Ajout au Menu de Navigation</h2>
+    </div>
+
+    <div class="section-card">
+        <p class="mb-4">Modifiez <code>resources/views/layouts/navigation.blade.php</code> pour ajouter le lien vers la gestion des catégories pour les admins :</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-lang">HTML (layouts/navigation.blade.php)</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<!-- Navigation Links -->
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route(\'dashboard\')" :active="request()->routeIs(\'dashboard\')">
+                        {{ __(\'Dashboard\') }}
+                    </x-nav-link>
+                    @auth
+                        @if(Auth::user()->hasRole(\'admin\'))
+                            <x-nav-link :href="route(\'admin.categories.index\')" :active="request()->routeIs(\'admin.categories.*\')">
+                                Gestion Catégories
+                            </x-nav-link>
+                        @endif
+                    @endauth
+                </div>') ?></div>
+        </div>
+    </div>
+</section>
+
+<!-- 4.7 Verification -->
 <section id="seance4-verify" class="mb-16 scroll-mt-20">
     <div class="flex items-center mb-6">
         <span class="badge-seance badge-seance-4 mr-3">Séance 4</span>
