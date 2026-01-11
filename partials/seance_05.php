@@ -23,7 +23,7 @@
             Avant de permettre aux vendeurs de créer des produits, nous devons gérer le multi-langue pour que les produits puissent avoir un nom et une description en Français, Anglais, etc.
         </p>
 
-        <h3 class="text-xl font-bold text-gray-800 mb-4">Installation de mcamara/laravel-localization</h3>
+        <h3 class="text-xl font-bold text-gray-800 mb-4">1. Installation et Configuration</h3>
         
         <div class="code-block-wrapper">
             <div class="code-lang">TERMINAL</div>
@@ -47,8 +47,141 @@ php artisan vendor:publish --provider="Mcamara\LaravelLocalization\LaravelLocali
 })') ?></div>
         </div>
 
-        <div class="alert-info mt-4">
-            <strong>Configuration :</strong> Dans <code>config/laravellocalization.php</code>, décommentez les lignes pour 'en', 'es' et 'ar' si vous souhaitez supporter ces langues en plus du Français.
+        <h3 class="text-xl font-bold text-gray-800 mb-4 mt-8">1.b Configuration des Routes (web.php)</h3>
+        <p class="mb-4">
+            Pour que le préfixe de langue (ex: <code>/en/admin/categories</code>) fonctionne, vous devez envelopper toutes vos routes web dans le groupe <code>LaravelLocalization</code>.
+        </p>
+
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP (routes/web.php)</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('Route::group([
+    \'prefix\' => \Mcamara\LaravelLocalization\Facades\LaravelLocalization::setLocale(),
+    \'middleware\' => [\'localeSessionRedirect\', \'localizationRedirect\', \'localeViewPath\', \'localize\'] // \'localize\' est important ici !
+], function() {
+
+    // --- COLLET TOUTES VOS ROUTES ICI ---
+    
+    Route::get(\'/\', [HomeController::class, \'index\'])->name(\'home\');
+    
+    // Auth Routes
+    require __DIR__.\'/auth.php\';
+
+    // Admin Routes
+    Route::middleware([\'auth\', \'role:admin\'])->prefix(\'admin\')->name(\'admin.\')->group(function () {
+        // ...
+    });
+
+    // Vendor Routes
+    Route::middleware([\'auth\', \'role:vendor\'])->prefix(\'vendor\')->name(\'vendor.\')->group(function () {
+        // ...
+    });
+
+});') ?></div>
+        </div>
+
+        <h3 class="text-xl font-bold text-gray-800 mb-4 mt-8">2. Fichiers de Traduction</h3>
+        <p class="mb-4">Créez la structure de dossiers pour les langues (ex: <code>lang/fr</code>, <code>lang/en</code>, <code>lang/ar</code>).</p>
+        
+        <p class="font-bold mb-2">Exemple : <code>lang/fr/messages.php</code></p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<?php
+return [
+    \'dashboard\' => \'Tableau de bord\',
+    \'vendor_dashboard\' => \'Espace Vendeur\',
+    \'admin_dashboard\' => \'Administration\',
+    \'my_shop\' => \'Ma Boutique\',
+    \'products\' => \'Produits\',
+    \'sales\' => \'Ventes\',
+    \'welcome\' => \'Bienvenue\',
+];') ?></div>
+        </div>
+
+        <p class="font-bold mb-2 mt-4">Exemple : <code>lang/en/messages.php</code></p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<?php
+return [
+    \'dashboard\' => \'Dashboard\',
+    \'vendor_dashboard\' => \'Vendor Area\',
+    \'admin_dashboard\' => \'Administration\',
+    \'my_shop\' => \'My Shop\',
+    \'products\' => \'Products\',
+    \'sales\' => \'Sales\',
+    \'welcome\' => \'Welcome\',
+];') ?></div>
+        </div>
+        
+        <p class="font-bold mb-2 mt-4">Exemple : <code>lang/ar/messages.php</code></p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<?php
+return [
+    \'dashboard\' => \'لوحة التحكم\',
+    \'vendor_dashboard\' => \'منطقة البائع\',
+    \'admin_dashboard\' => \'الإدارة\',
+    \'my_shop\' => \'متجري\',
+    \'products\' => \'المنتجات\',
+    \'sales\' => \'المبيعات\',
+    \'welcome\' => \'مرحباً\',
+];') ?></div>
+        </div>
+
+        <h3 class="text-xl font-bold text-gray-800 mb-4 mt-8">3. Sélecteur de Langue (Navbar)</h3>
+        <p class="mb-4">Ajoutez ce menu déroulant dans votre navigation (ex: <code>resources/views/layouts/navigation.blade.php</code>) :</p>
+        
+        <div class="code-block-wrapper">
+            <div class="code-lang">HTML</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<div class="hidden sm:flex sm:items-center sm:ms-6">
+    <x-dropdown align="right" width="48">
+        <x-slot name="trigger">
+            <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                <div>{{ LaravelLocalization::getCurrentLocaleNative() }}</div>
+                <div class="ms-1">
+                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+            </button>
+        </x-slot>
+
+        <x-slot name="content">
+            @foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+                <x-dropdown-link :href="LaravelLocalization::getLocalizedURL($localeCode, null, [], true)">
+                    {{ $properties[\'native\'] }}
+                </x-dropdown-link>
+            @endforeach
+        </x-slot>
+    </x-dropdown>
+</div>') ?></div>
+        </div>
+
+        <h3 class="text-xl font-bold text-gray-800 mb-4 mt-8">4. Utilisation dans les Vues</h3>
+        <p class="mb-2">Remplacez les textes en dur par la fonction <code>__()</code>.</p>
+        
+        <p class="font-bold">Dans le Dashboard Admin :</p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">HTML</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<h2 class="font-semibold text-xl text-gray-800 leading-tight">
+    {{ __(\'messages.admin_dashboard\') }}
+</h2>') ?></div>
+        </div>
+
+        <p class="font-bold mt-4">Dans le Dashboard Vendeur :</p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">HTML</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<h2 class="font-semibold text-xl text-gray-800 leading-tight">
+    {{ __(\'messages.vendor_dashboard\') }}
+</h2>
+<h3>{{ __(\'messages.welcome\') }}, {{ $store->name }}</h3>
+<a href="#">{{ __(\'messages.my_shop\') }}</a>') ?></div>
         </div>
     </div>
 </section>
@@ -258,10 +391,90 @@ class ProductController extends Controller
 <section id="seance5-views" class="mb-16 scroll-mt-20">
     <div class="flex items-center mb-6">
         <span class="badge-seance badge-seance-5 mr-3">Séance 5</span>
-        <h2 class="text-2xl font-bold text-gray-800">5.5 Vues : Formulaire Complet</h2>
+        <h2 class="text-2xl font-bold text-gray-800">5.5 Vues : Liste & Formulaire</h2>
     </div>
 
     <div class="section-card">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">A. Liste des Produits (index.blade.php)</h3>
+        <p class="mb-2">Créez <code>resources/views/vendor/products/index.blade.php</code> :</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-lang">HTML</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<x-app-layout>
+    <x-slot name="header">
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __(\'messages.products\') }}
+            </h2>
+            <a href="{{ route(\'vendor.products.create\') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Nouveau Produit
+            </a>
+        </div>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    @if(session(\'success\'))
+                        <div class="alert alert-success mb-4">{{ session(\'success\') }}</div>
+                    @endif
+
+                    <table class="table align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Image</th>
+                                <th>Nom</th>
+                                <th>Prix</th>
+                                <th>Statut</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($products as $product)
+                            <tr>
+                                <td>
+                                    <img src="{{ $product->thumbnail_url }}" class="rounded shadow-sm" style="width: 50px; height: 50px; object-fit: cover;">
+                                </td>
+                                <td class="fw-bold">{{ $product->name }}</td>
+                                <td>{{ number_format($product->price, 2) }} €</td>
+                                <td>
+                                    @if($product->is_active)
+                                        <span class="badge bg-success">Actif</span>
+                                    @else
+                                        <span class="badge bg-secondary">Inactif</span>
+                                    @endif
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <a href="#" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="bi bi-box2 display-6 d-block mb-3"></i>
+                                    Aucun produit trouvé.
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+
+                    <div class="mt-4">
+                        {{ $products->links() }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>') ?></div>
+        </div>
+
+        <h3 class="text-xl font-bold text-gray-800 mb-4 mt-8">B. Formulaire de Création (create.blade.php)</h3>
         <p class="mb-2">Créez <code>resources/views/vendor/products/create.blade.php</code> :</p>
         
         <div class="code-block-wrapper">
@@ -338,6 +551,28 @@ class ProductController extends Controller
         </div>
     </div>
 </x-app-layout>') ?></div>
+        </div>
+    </div>
+</section>
+
+<!-- 5.6 Navigation -->
+<section id="seance5-nav" class="mb-16 scroll-mt-20">
+    <div class="flex items-center mb-6">
+        <span class="badge-seance badge-seance-5 mr-3">Séance 5</span>
+        <h2 class="text-2xl font-bold text-gray-800">5.6 Mise à jour de la Navigation</h2>
+    </div>
+
+    <div class="section-card">
+        <p class="mb-4">Ajoutez le lien "Mes Produits" dans la barre de navigation (<code>resources/views/layouts/navigation.blade.php</code>) pour les vendeurs :</p>
+
+        <div class="code-block-wrapper">
+            <div class="code-lang">HTML</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('@if(Auth::user()->is_vendor)
+    <x-nav-link :href="route(\'vendor.products.index\')" :active="request()->routeIs(\'vendor.products.*\')">
+        {{ __(\'messages.products\') }}
+    </x-nav-link>
+@endif') ?></div>
         </div>
     </div>
 </section>
