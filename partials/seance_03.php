@@ -154,6 +154,51 @@ class Store extends Model implements HasMedia
     </div>
 </section>
 
+<!-- 3.3b Migration Commission Rate -->
+<section id="seance3-migration-commission" class="mb-16 scroll-mt-20">
+    <div class="flex items-center mb-6">
+        <span class="badge-seance badge-seance-3 mr-3">Séance 3</span>
+        <h2 class="text-2xl font-bold text-gray-800">3.3b Migration Commission Rate</h2>
+    </div>
+
+    <div class="section-card">
+        <p class="mb-4">
+            Ajoutez le champ <code>commission_rate</code> à la table <code>stores</code> pour gérer les commissions.
+        </p>
+
+        <div class="code-block-wrapper">
+            <div class="code-lang">TERMINAL</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">php artisan make:migration add_commission_rate_to_stores_table --table=stores</div>
+        </div>
+
+        <p class="mb-2 mt-4">Cochez le fichier de migration :</p>
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('public function up(): void
+{
+    Schema::table(\'stores\', function (Blueprint $table) {
+        $table->decimal(\'commission_rate\', 5, 2)->default(10.00)->after(\'description\');
+    });
+}
+
+public function down(): void
+{
+    Schema::table(\'stores\', function (Blueprint $table) {
+        $table->dropColumn(\'commission_rate\');
+    });
+}') ?></div>
+        </div>
+
+        <div class="code-block-wrapper mt-4">
+            <div class="code-lang">TERMINAL</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">php artisan migrate</div>
+        </div>
+    </div>
+</section>
+
 <!-- 3.3 Contrôleur & Logique -->
 <section id="seance3-controller" class="mb-16 scroll-mt-20">
     <div class="flex items-center mb-6">
@@ -176,7 +221,7 @@ class Store extends Model implements HasMedia
             <div class="code-block"><?= htmlspecialchars('public function create()
 {
     // Si l\'utilisateur a déjà une boutique, redirection
-    if (Auth::user()->is_vendor) {
+    if (Auth()->user()->is_vendor) {
         return redirect()->route(\'vendor.dashboard\');
     }
     return view(\'vendor.store.create\');
@@ -190,7 +235,7 @@ public function store(Request $request)
         \'logo\' => \'nullable|image|max:1024\', // Max 1Mo
     ]);
 
-    $user = Auth::user();
+    $user = Auth()->user();
 
     // 1. Créer la boutique
     $store = \App\Models\Store::create([
@@ -323,21 +368,71 @@ public function store(Request $request)
         <a href="{{ route(\'admin.dashboard\') }}" class="nav-link">Dashboard Admin</a>
     @else
         <a href="{{ route(\'become.vendor\') }}" class="btn btn-outline-primary">Devenir Vendeur</a>
-        <a href="{{ route(\'dashboard\') }}" class="nav-link">Mon Compte</a>
+        
     @endif
     
-    <!-- Logout Form -->
-    <form method="POST" action="{{ route(\'logout\') }}" class="d-inline">
-        @csrf
-        <button type="submit" class="btn btn-link nav-link">Déconnexion</button>
-    </form>
+   
 @else
     <a href="{{ route(\'login\') }}" class="nav-link">Connexion</a>
     <a href="{{ route(\'register\') }}" class="nav-link">Inscription</a>
-@endauth') ?></div>
+@endauth
+&nbsp;') ?>
+</div>
         </div>
     </div>
 </section>
+
+<!-- 3.5b Mise à jour du Dashboard -->
+<section id="seance3-dashboard-update" class="mb-16 scroll-mt-20">
+    <div class="flex items-center mb-6">
+        <span class="badge-seance badge-seance-3 mr-3">Séance 3</span>
+        <h2 class="text-2xl font-bold text-gray-800">3.5b Mise à jour du Dashboard Vendeur</h2>
+    </div>
+
+    <div class="section-card">
+        <p class="mb-4">
+            Modifiez <code>resources/views/vendor/dashboard.blade.php</code> pour afficher le nom de la boutique si elle existe, sinon le lien de création.
+        </p>
+        
+        <div class="code-block-wrapper">
+            <div class="code-lang">HTML (extrait)</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars('<div class="p-6 text-gray-900">
+    @if(Auth::user()->store)
+        <h3 class="text-lg font-bold mb-4">Bienvenue, {{ Auth::user()->store->name }}</h3>
+    @else
+        <div class="alert alert-warning">
+            Vous n\'avez pas encore de boutique active. <a href="{{ route(\'become.vendor\') }}" class="underline">Créer ma boutique</a>.
+        </div>
+    @endif
+</div>') ?></div>
+        </div>
+    </div>
+</section>
+
+<!-- 3.5b Mise à jour du modèle User -->
+<section id="seance3-dashboard-update" class="mb-16 scroll-mt-20">
+    <div class="flex items-center mb-6">
+        <span class="badge-seance badge-seance-3 mr-3">Séance 3</span>
+        <h2 class="text-2xl font-bold text-gray-800">3.5b Mise à jour du Dashboard Vendeur</h2>
+    </div>
+
+    <div class="section-card">
+        <p class="mb-4">
+            Modifiez <code>app/Models/User.php</code> pour ajouter la relation avec le modèle Store.
+        </p>
+        
+        <div class="code-block-wrapper">
+            <div class="code-lang">PHP (app/Models/User.php)</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block"><?= htmlspecialchars(' public function store(): HasOne
+    {
+        return $this->hasOne(Store::class);
+    }') ?></div>
+        </div>
+    </div>
+</section>
+
 
 <!-- 3.6 Vérification -->
 <section id="seance3-verification" class="mb-16 scroll-mt-20">
