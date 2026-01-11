@@ -30,6 +30,28 @@
     </div>
 </section>
 
+<!-- 4.1b Configuration Environnement -->
+<section id="seance4-env" class="mb-16 scroll-mt-20">
+    <div class="flex items-center mb-6">
+        <span class="badge-seance badge-seance-4 mr-3">Séance 4</span>
+        <h2 class="text-2xl font-bold text-gray-800">4.1b Configuration de l'environnement (.env)</h2>
+    </div>
+
+    <div class="section-card">
+        <p class="mb-4">
+            Pour que les images s'affichent correctement via Spatie Media Library, vous devez configurer l'URL de l'application dans votre fichier <code>.env</code>.
+        </p>
+
+        <div class="code-block-wrapper">
+            <div class="code-lang">ENV (.env)</div>
+            <button class="copy-btn">Copier</button>
+            <div class="code-block">APP_URL=http://localhost:8000</div>
+        </div>
+        
+        <p class="text-sm text-gray-500 mt-2">Cela permet de générer des URL absolues correctes pour les images uploadées.</p>
+    </div>
+</section>
+
 <!-- 4.2 Configuration Modèle -->
 <section id="seance4-model" class="mb-16 scroll-mt-20">
     <div class="flex items-center mb-6">
